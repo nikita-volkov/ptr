@@ -86,6 +86,6 @@ peekLEWord64 =
 Allocate a new byte array with @memcpy@.
 -}
 {-# INLINE peekBytes #-}
-peekBytes :: Int -> Ptr Word8 -> IO ByteString
-peekBytes amount ptr =
+peekBytes :: Ptr Word8 -> Int -> IO ByteString
+peekBytes ptr amount =
   A.create amount $ \destPtr -> A.memcpy destPtr ptr amount

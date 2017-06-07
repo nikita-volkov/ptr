@@ -53,4 +53,4 @@ leWord64 =
 {-# INLINE bytes #-}
 bytes :: Int -> Take ByteString
 bytes amount =
-  Take amount (A.peekBytes amount)
+  Take amount (\ptr -> A.peekBytes ptr amount)
