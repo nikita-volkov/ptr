@@ -43,8 +43,6 @@ library
   other-modules:
     PtrMagic.Parse
     PtrMagic.IO
-    PtrMagic.Peek
-    PtrMagic.Do
     PtrMagic.Prelude
   build-depends:
     -- data:
