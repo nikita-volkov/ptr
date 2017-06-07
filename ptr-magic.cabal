@@ -1,7 +1,7 @@
 name:
   ptr-magic
 version:
-  0.1
+  0.2
 category:
   Ptr, Data
 synopsis:
@@ -39,7 +39,7 @@ library
   default-language:
     Haskell2010
   exposed-modules:
-    PtrMagic.Consume
+    PtrMagic.Take
   other-modules:
     PtrMagic.Parse
     PtrMagic.IO
