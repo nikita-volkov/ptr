@@ -1,7 +1,7 @@
 name:
   ptr-magic
 version:
-  0.2
+  0.2.1
 category:
   Ptr, Data
 synopsis:
@@ -40,9 +40,11 @@ library
     Haskell2010
   exposed-modules:
     PtrMagic.Take
+    PtrMagic.Put
   other-modules:
     PtrMagic.Parse
     PtrMagic.IO
+    PtrMagic.UncheckedShifting
     PtrMagic.Prelude
   build-depends:
     -- data:

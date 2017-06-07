@@ -4,6 +4,7 @@ where
 
 import PtrMagic.Prelude
 import qualified Data.ByteString.Internal as A
+import qualified PtrMagic.UncheckedShifting as D
 
 
 {-# INLINE peekStorable #-}
@@ -89,3 +90,73 @@ Allocate a new byte array with @memcpy@.
 peekBytes :: Ptr Word8 -> Int -> IO ByteString
 peekBytes ptr amount =
   A.create amount $ \destPtr -> A.memcpy destPtr ptr amount
+
+{-# INLINE pokeStorable #-}
+pokeStorable :: Storable a => Ptr Word8 -> a -> IO ()
+pokeStorable ptr value =
+  pokeStorable (castPtr ptr) value
+
+{-# INLINE pokeWord8 #-}
+pokeWord8 :: Ptr Word8 -> Word8 -> IO ()
+pokeWord8 ptr value =
+  poke ptr value
+
+{-# INLINE pokeBEWord16 #-}
+pokeBEWord16 :: Ptr Word8 -> Word16 -> IO ()
+#ifdef WORDS_BIGENDIAN
+pokeBEWord16 =
+  poke
+#else
+pokeBEWord16 ptr value =
+  do
+    pokeStorable ptr (fromIntegral (D.shiftr_w16 value 8) :: Word8)
+    pokeByteOff ptr 1 (fromIntegral value :: Word8)
+#endif
+
+{-# INLINE pokeBEWord32 #-}
+pokeBEWord32 :: Ptr Word8 -> Word32 -> IO ()
+#ifdef WORDS_BIGENDIAN
+pokeBEWord32 =
+  pokeStorable
+#else
+pokeBEWord32 ptr value =
+  do
+    pokeStorable ptr (fromIntegral (D.shiftr_w32 value 24) :: Word8)
+    pokeByteOff ptr 1 (fromIntegral (D.shiftr_w32 value 16) :: Word8)
+    pokeByteOff ptr 2 (fromIntegral (D.shiftr_w32 value 8) :: Word8)
+    pokeByteOff ptr 3 (fromIntegral value :: Word8)
+#endif
+
+{-# INLINE pokeBEWord64 #-}
+pokeBEWord64 :: Ptr Word8 -> Word64 -> IO ()
+#ifdef WORDS_BIGENDIAN
+pokeBEWord64 =
+  pokeStorable
+#else
+#if WORD_SIZE_IN_BITS < 64
+--
+-- To avoid expensive 64 bit shifts on 32 bit machines, we cast to
+-- Word32, and write that
+--
+pokeBEWord64 ptr value =
+  do
+    pokeBEWord32 ptr (fromIntegral (D.shiftr_w64 value 32))
+    pokeBEWord32 ptr (fromIntegral value)
+#else
+pokeBEWord64 ptr value =
+  do
+    pokeStorable ptr (fromIntegral (D.shiftr_w64 value 56) :: Word8)
+    pokeByteOff ptr 1 (fromIntegral (D.shiftr_w64 value 48) :: Word8)
+    pokeByteOff ptr 2 (fromIntegral (D.shiftr_w64 value 40) :: Word8)
+    pokeByteOff ptr 3 (fromIntegral (D.shiftr_w64 value 32) :: Word8)
+    pokeByteOff ptr 4 (fromIntegral (D.shiftr_w64 value 24) :: Word8)
+    pokeByteOff ptr 5 (fromIntegral (D.shiftr_w64 value 16) :: Word8)
+    pokeByteOff ptr 6 (fromIntegral (D.shiftr_w64 value  8) :: Word8)
+    pokeByteOff ptr 7 (fromIntegral value :: Word8)
+#endif
+#endif
+
+{-# INLINE pokeBytes #-}
+pokeBytes :: Ptr Word8 -> Int -> ByteString -> IO ()
+pokeBytes ptr maxLength (A.PS fptr offset length) =
+  withForeignPtr fptr $ \bytesPtr -> A.memcpy ptr (plusPtr bytesPtr offset) (min length maxLength)
