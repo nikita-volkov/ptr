@@ -2,7 +2,7 @@ module PtrMagic.Parse
 where
 
 import PtrMagic.Prelude
-import qualified PtrMagic.Take as A
+import qualified PtrMagic.Pull as A
 
 
 newtype Parse parsed =
@@ -40,8 +40,8 @@ instance Monad Parse where
                   (\parsed2 consumed2 -> succeed parsed2 (consumed1 + consumed2))))
 
 {-# INLINE consume #-}
-consume :: A.Take consumed -> Parse consumed
-consume (A.Take amount ptrIO) =
+consume :: A.Pull consumed -> Parse consumed
+consume (A.Pull amount ptrIO) =
   Parse
     (\ptr available fail succeed ->
       if available >= amount
