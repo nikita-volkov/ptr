@@ -94,7 +94,7 @@ peekBytes ptr amount =
 {-# INLINE pokeStorable #-}
 pokeStorable :: Storable a => Ptr Word8 -> a -> IO ()
 pokeStorable ptr value =
-  pokeStorable (castPtr ptr) value
+  poke (castPtr ptr) value
 
 {-# INLINE pokeWord8 #-}
 pokeWord8 :: Ptr Word8 -> Word8 -> IO ()
@@ -141,7 +141,7 @@ pokeBEWord64 =
 pokeBEWord64 ptr value =
   do
     pokeBEWord32 ptr (fromIntegral (D.shiftr_w64 value 32))
-    pokeBEWord32 ptr (fromIntegral value)
+    pokeBEWord32 (plusPtr ptr 4) (fromIntegral value)
 #else
 pokeBEWord64 ptr value =
   do

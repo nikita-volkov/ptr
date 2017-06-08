@@ -1,7 +1,7 @@
 name:
   ptr-magic
 version:
-  0.3
+  0.3.0.1
 category:
   Ptr, Data
 synopsis:
@@ -62,11 +62,11 @@ library
     base-prelude >= 1 && < 2,
     base >= 4.7 && < 5
 
-test-suite sandbox
+test-suite tests
   type:
     exitcode-stdio-1.0
   hs-source-dirs:
-    sandbox
+    tests
   main-is:
     Main.hs
   ghc-options:
@@ -78,6 +78,13 @@ test-suite sandbox
   default-language:
     Haskell2010
   build-depends:
+    --
     ptr-magic,
+    -- testing:
+    tasty == 0.11.*,
+    tasty-quickcheck == 0.8.*,
+    tasty-hunit == 0.9.*,
+    quickcheck-instances >= 0.3.11 && < 0.4,
+    --
     bug == 1.*,
     rerebase == 1.*
