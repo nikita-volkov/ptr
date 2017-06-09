@@ -1,7 +1,7 @@
 name:
   ptr-magic
 version:
-  0.3.0.1
+  0.3.1
 category:
   Ptr, Data
 synopsis:
@@ -40,6 +40,7 @@ library
     Haskell2010
   exposed-modules:
     PtrMagic.Pull
+    PtrMagic.PullAll
     PtrMagic.Push
   other-modules:
     PtrMagic.Parse
