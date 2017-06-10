@@ -40,4 +40,4 @@ beWord64 =
 {-# INLINE bytes #-}
 bytes :: Int -> Push ByteString
 bytes amount =
-  Push amount (\ptr -> A.pokeBytes ptr amount)
+  Push amount (\ptr -> A.pokeBytesTrimming ptr amount)
