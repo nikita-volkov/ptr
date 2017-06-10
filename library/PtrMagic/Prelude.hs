@@ -40,10 +40,6 @@ import Control.Monad.Writer.Class as Exports
 import Data.Functor.Contravariant as Exports
 import Data.Functor.Contravariant.Divisible as Exports
 
--- invariant
--------------------------
-import Data.Functor.Invariant as Exports
-
 -- profunctors
 -------------------------
 import Data.Profunctor.Unsafe as Exports

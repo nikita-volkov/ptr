@@ -44,6 +44,6 @@ bytes amount =
   Push amount (\ptr -> A.pokeBytesTrimming ptr amount)
 
 {-# INLINE codec #-}
-codec :: B.Codec value -> Push value
+codec :: B.Codec input output -> Push input
 codec (B.Codec size io _) =
   Push size io

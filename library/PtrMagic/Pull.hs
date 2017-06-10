@@ -57,6 +57,6 @@ bytes amount =
   Pull amount (\ptr -> A.peekBytes ptr amount)
 
 {-# INLINE codec #-}
-codec :: B.Codec value -> Pull value
+codec :: B.Codec input output -> Pull output
 codec (B.Codec size _ io) =
   Pull size io
