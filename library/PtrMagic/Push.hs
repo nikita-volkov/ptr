@@ -3,6 +3,7 @@ where
 
 import PtrMagic.Prelude
 import qualified PtrMagic.IO as A
+import qualified PtrMagic.Codec as B
 
 
 data Push pushed =
@@ -41,3 +42,8 @@ beWord64 =
 bytes :: Int -> Push ByteString
 bytes amount =
   Push amount (\ptr -> A.pokeBytesTrimming ptr amount)
+
+{-# INLINE codec #-}
+codec :: B.Codec value -> Push value
+codec (B.Codec size io _) =
+  Push size io

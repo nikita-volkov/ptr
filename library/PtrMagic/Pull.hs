@@ -3,6 +3,7 @@ where
 
 import PtrMagic.Prelude
 import qualified PtrMagic.IO as A
+import qualified PtrMagic.Codec as B
 
 
 data Pull pulled =
@@ -54,3 +55,8 @@ leWord64 =
 bytes :: Int -> Pull ByteString
 bytes amount =
   Pull amount (\ptr -> A.peekBytes ptr amount)
+
+{-# INLINE codec #-}
+codec :: B.Codec value -> Pull value
+codec (B.Codec size _ io) =
+  Pull size io
