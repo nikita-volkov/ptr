@@ -5,6 +5,9 @@ import PtrMagic.Prelude
 import qualified PtrMagic.IO as A
 
 
+{-|
+Encoder and decoder of the same binary representation.
+-}
 data Codec input output =
   Codec !Int !(Ptr Word8 -> input -> IO ()) !(Ptr Word8 -> IO output)
 
