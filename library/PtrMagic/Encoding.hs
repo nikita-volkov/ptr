@@ -3,7 +3,7 @@ where
 
 import PtrMagic.Prelude
 import qualified PtrMagic.IO as A
-import qualified PtrMagic.Push as C
+import qualified PtrMagic.Encoder as C
 import qualified Data.ByteString.Internal as B
 
 
@@ -69,7 +69,7 @@ bytes :: ByteString -> Encoding
 bytes (B.PS bytesFPtr offset length) =
   Encoding length (\ptr -> withForeignPtr bytesFPtr (\bytesPtr -> B.memcpy ptr (plusPtr bytesPtr offset) length))
 
-{-# INLINE push #-}
-push :: C.Push pushed -> pushed -> Encoding
-push (C.Push space action) pushed =
-  Encoding space (\ptr -> action ptr pushed)
+{-# INLINE encoder #-}
+encoder :: C.Encoder input -> input -> Encoding
+encoder (C.Encoder space action) input =
+  Encoding space (\ptr -> action ptr input)

@@ -7,8 +7,8 @@ import Test.Tasty.Runners
 import Test.Tasty.HUnit
 import Test.Tasty.QuickCheck
 import Test.QuickCheck.Instances
-import qualified PtrMagic.Push as B
-import qualified PtrMagic.Pull as C
+import qualified PtrMagic.Encoder as B
+import qualified PtrMagic.Decoder as C
 import qualified Data.ByteString as D
 
 
@@ -16,21 +16,21 @@ main =
   defaultMain $
   testGroup "All tests"
   [
-    testProperty "Push and pull (bytes)" $ \input -> input === fromJust (pushAndPull (B.bytes (D.length input)) (C.bytes (D.length input))) input
+    testProperty "Encoder and decoder (bytes)" $ \input -> input === fromJust (encoderAndDecoder (B.bytes (D.length input)) (C.bytes (D.length input))) input
     ,
-    testProperty "Push and pull (word8)" $ \input -> input === fromJust (pushAndPull B.word8 C.word8) input
+    testProperty "Encoder and decoder (word8)" $ \input -> input === fromJust (encoderAndDecoder B.word8 C.word8) input
     ,
-    testProperty "Push and pull (beWord32)" $ \input -> input === fromJust (pushAndPull B.beWord32 C.beWord32) input
+    testProperty "Encoder and decoder (beWord32)" $ \input -> input === fromJust (encoderAndDecoder B.beWord32 C.beWord32) input
     ,
-    testProperty "Push and pull (beWord64)" $ \input -> input === fromJust (pushAndPull B.beWord64 C.beWord64) input
+    testProperty "Encoder and decoder (beWord64)" $ \input -> input === fromJust (encoderAndDecoder B.beWord64 C.beWord64) input
   ]
 
-pushAndPull :: B.Push a -> C.Pull a -> Maybe (a -> a)
-pushAndPull (B.Push pushSize pushIO) (C.Pull pullSize pullIO) =
-  if pushSize /= pullSize
+encoderAndDecoder :: B.Encoder a -> C.Decoder a -> Maybe (a -> a)
+encoderAndDecoder (B.Encoder encoderSize encoderIO) (C.Decoder decoderSize decoderIO) =
+  if encoderSize /= decoderSize
     then Nothing
     else Just $ \input -> unsafePerformIO $ do
-      fp <- mallocForeignPtrBytes pushSize
+      fp <- mallocForeignPtrBytes encoderSize
       withForeignPtr fp $ \p -> do
-        pushIO p input
-        pullIO p
+        encoderIO p input
+        decoderIO p
