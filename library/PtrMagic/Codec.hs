@@ -7,9 +7,26 @@ import qualified PtrMagic.IO as A
 
 {-|
 Encoder and decoder of the same binary representation.
+
+You can compose both the covariant and contravariant parameters of Codec
+using Applicative and Profunctor. E.g.,
+
+>word8AndWord32 :: Codec (Word8, Word32) (Word8, Word32)
+>word8AndWord32 =
+>  (,) <$> lmap fst word8 <*> lmap snd beWord32
 -}
 data Codec input output =
   Codec !Int !(Ptr Word8 -> input -> IO ()) !(Ptr Word8 -> IO output)
+
+{-|
+A codec, which encodes and decodes the same type. E.g.,
+
+>word8AndWord32 :: InvCodec (Word8, Word32)
+>word8AndWord32 =
+>  (,) <$> lmap fst word8 <*> lmap snd beWord32
+-}
+type InvCodec value =
+  Codec value value
 
 instance Profunctor Codec where
   {-# INLINE dimap #-}

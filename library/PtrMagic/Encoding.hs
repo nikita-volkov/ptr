@@ -4,6 +4,7 @@ where
 import PtrMagic.Prelude
 import qualified PtrMagic.IO as A
 import qualified PtrMagic.Encoder as C
+import qualified PtrMagic.Codec as D
 import qualified Data.ByteString.Internal as B
 
 
@@ -71,5 +72,10 @@ bytes (B.PS bytesFPtr offset length) =
 
 {-# INLINE encoder #-}
 encoder :: C.Encoder input -> input -> Encoding
-encoder (C.Encoder space action) input =
-  Encoding space (\ptr -> action ptr input)
+encoder (C.Encoder space poke) input =
+  Encoding space (\ptr -> poke ptr input)
+
+{-# INLINE codec #-}
+codec :: D.Codec input output -> input -> Encoding
+codec (D.Codec space poke _) input =
+  Encoding space (\ptr -> poke ptr input)
