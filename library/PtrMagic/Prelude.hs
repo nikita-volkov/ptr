@@ -43,6 +43,7 @@ import Data.Functor.Contravariant.Divisible as Exports
 -- profunctors
 -------------------------
 import Data.Profunctor.Unsafe as Exports
+import Data.Profunctor as Exports hiding (WrappedArrow, WrapArrow, unwrapArrow)
 
 -- semigroups
 -------------------------
