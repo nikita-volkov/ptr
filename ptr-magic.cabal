@@ -1,7 +1,7 @@
 name:
   ptr-magic
 version:
-  0.4.1
+  0.5
 category:
   Ptr, Data
 synopsis:
@@ -40,13 +40,13 @@ library
     Haskell2010
   exposed-modules:
     PtrMagic.Decoder
-    PtrMagic.DynamicDecoder
     PtrMagic.Encoder
-    PtrMagic.Encoding
     PtrMagic.Codec
-    PtrMagic.ByteString
   other-modules:
+    PtrMagic.ByteString
+    PtrMagic.Encoding
     PtrMagic.Parse
+    PtrMagic.DynamicDecoder
     PtrMagic.IO
     PtrMagic.UncheckedShifting
     PtrMagic.Prelude
