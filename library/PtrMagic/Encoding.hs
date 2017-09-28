@@ -9,7 +9,7 @@ import qualified Data.ByteString.Internal as B
 
 
 {-|
-Efficiently composable specification of how to encode data.
+Efficiently composable specification of how to populate a pointer.
 -}
 data Encoding =
   {-|
