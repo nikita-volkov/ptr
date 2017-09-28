@@ -1,4 +1,9 @@
 module PtrMagic.Receiver
+(
+  Receiver,
+  create,
+  decode,
+)
 where
 
 import PtrMagic.Prelude
@@ -17,6 +22,13 @@ data Receiver =
   * Chunk size
   -}
   Receiver !(Ptr Word8 -> Int -> IO (Either Text Int)) !(ForeignPtr Word8) !(IORef (Int, Int)) !Int
+
+create :: (Ptr Word8 -> Int -> IO (Either Text Int)) -> Int -> IO Receiver
+create fetch chunkSize =
+  do
+    bufferFP <- mallocForeignPtrBytes chunkSize
+    bufferStateRef <- newIORef (0, 0)
+    return (Receiver fetch bufferFP bufferStateRef chunkSize)
 
 {-|
 Receive as many bytes as is required by the provided decoder and decode immediately.
