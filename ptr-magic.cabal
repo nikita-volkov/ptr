@@ -43,10 +43,10 @@ library
     PtrMagic.Encoder
     PtrMagic.Codec
     PtrMagic.Receiver
+    PtrMagic.Encoding
   other-modules:
     PtrMagic.Receiver.Core
     PtrMagic.ByteString
-    PtrMagic.Encoding
     PtrMagic.Parse
     PtrMagic.DynamicDecoder
     PtrMagic.IO
