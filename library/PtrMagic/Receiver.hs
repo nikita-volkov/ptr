@@ -3,6 +3,7 @@ where
 
 import PtrMagic.Prelude
 import qualified PtrMagic.Receiver.Core as A
+import qualified PtrMagic.Decoder as B
 
 
 {-|
@@ -17,27 +18,14 @@ data Receiver =
   -}
   Receiver !(Ptr Word8 -> Int -> IO (Either Text Int)) !(ForeignPtr Word8) !(IORef (Int, Int)) !Int
 
-newtype Effect a =
-  Effect (ReaderT Receiver (ExceptT Text IO) a)
-  deriving (Functor, Applicative, Monad, MonadIO)
-
-{-# INLINE eitherIO #-}
-eitherIO :: (Receiver -> IO (Either Text a)) -> Effect a
-eitherIO eitherIO =
-  Effect (ReaderT (\receiver -> ExceptT (eitherIO receiver)))
-
-write :: Int -> Ptr Word8 -> Effect ()
-write howMany destination =
-  eitherIO (\(Receiver fetch bufferFP bufferStateRef chunkSize) -> A.write fetch bufferFP bufferStateRef chunkSize howMany destination)
-
 {-|
-Receive the specified amount of bytes,
-immediately decoding as many bytes from a pointer into some result.
+Receive as many bytes as is required by the provided decoder and decode immediately.
+
+If all you need is just to get a 'ByteString' chunk then use the 'B.bytes' decoder.
 -}
-decode :: Int -> (Ptr Word8 -> IO decoded) -> Effect decoded
-decode howMany decode =
-  eitherIO (\(Receiver fetch bufferFP bufferStateRef chunkSize) -> A.decode fetch bufferFP bufferStateRef chunkSize howMany decode)
+decode :: Receiver -> B.Decoder decoded -> IO (Either Text decoded)
+decode (Receiver fetch bufferFP bufferStateRef chunkSize) (B.Decoder amount action) =
+  A.decode fetch bufferFP bufferStateRef chunkSize amount action
   
-getBufferFilling :: Effect Int
-getBufferFilling =
-  eitherIO (\(Receiver _ _ bufferStateRef _) -> fmap (\(offset, end) -> Right (end - offset)) (readIORef bufferStateRef))
+getBufferFilling :: Receiver -> IO Int
+getBufferFilling (Receiver _ _ bufferStateRef _) = fmap (\(offset, end) -> end - offset) (readIORef bufferStateRef)
