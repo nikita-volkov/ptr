@@ -52,21 +52,21 @@ instance Applicative (Codec input) where
         leftPeek ptr <*> rightPeek (plusPtr ptr leftSize)
 
 {-# INLINE word8 #-}
-word8 :: Codec Word8 Word8
+word8 :: InvCodec Word8
 word8 =
   Codec 1 A.pokeWord8 A.peekWord8
 
 {-# INLINE beWord32 #-}
-beWord32 :: Codec Word32 Word32
+beWord32 :: InvCodec Word32
 beWord32 =
   Codec 4 A.pokeBEWord32 A.peekBEWord32
 
 {-# INLINE beWord64 #-}
-beWord64 :: Codec Word64 Word64
+beWord64 :: InvCodec Word64
 beWord64 =
   Codec 8 A.pokeBEWord64 A.peekBEWord64
 
 {-# INLINE bytes #-}
-bytes :: Int -> Codec ByteString ByteString
+bytes :: Int -> InvCodec ByteString
 bytes amount =
   Codec amount (\ptr -> A.pokeBytesTrimming ptr amount) (\ptr -> A.peekBytes ptr amount)
