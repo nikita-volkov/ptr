@@ -26,6 +26,3 @@ If all you need is just to get a 'ByteString' chunk then use the 'B.bytes' decod
 decode :: Receiver -> B.Decoder decoded -> IO (Either Text decoded)
 decode (Receiver fetch bufferFP bufferStateRef chunkSize) (B.Decoder amount action) =
   A.decode fetch bufferFP bufferStateRef chunkSize amount action
-  
-getBufferFilling :: Receiver -> IO Int
-getBufferFilling (Receiver _ _ bufferStateRef _) = fmap (\(offset, end) -> end - offset) (readIORef bufferStateRef)
