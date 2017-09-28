@@ -16,6 +16,10 @@ where
 -------------------------
 import BasePrelude as Exports hiding (assert, left, right, isLeft, isRight, (<>), First(..), Last(..), ProtocolError, traceEvent, traceEventIO, traceMarker, traceMarkerIO)
 
+-- base
+-------------------------
+import Foreign as Exports hiding (void)
+
 -- transformers
 -------------------------
 import Control.Monad.IO.Class as Exports
