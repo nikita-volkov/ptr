@@ -11,7 +11,7 @@ A wrapper of a receiving action, which extends it with bufferization.
 -}
 data Receiver =
   {-|
-  * Exception-free action to receive another chunk of bytes. E.g., an exception-free wrapper of 'Network.Socket.recvBuf'
+  * Exception-free action to receive another chunk of bytes. E.g., an exception-free wrapper of @Network.Socket.recvBuf@
   * Buffer
   * Size of the buffer
   * Chunk size
