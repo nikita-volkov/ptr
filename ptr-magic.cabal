@@ -1,7 +1,7 @@
 name:
   ptr-magic
 version:
-  0.6.1
+  0.6.2
 category:
   Ptr, Data
 synopsis:
@@ -44,9 +44,9 @@ library
     PtrMagic.Codec
     PtrMagic.Receiver
     PtrMagic.Encoding
+    PtrMagic.ByteString
   other-modules:
     PtrMagic.Receiver.Core
-    PtrMagic.ByteString
     PtrMagic.Parse
     PtrMagic.DynamicDecoder
     PtrMagic.IO
