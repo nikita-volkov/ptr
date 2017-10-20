@@ -2,7 +2,6 @@ module PtrMagic.Decoder
 where
 
 import PtrMagic.Prelude
-import qualified PtrMagic.IO as A
 import qualified PtrMagic.Codec as B
 
 
@@ -29,32 +28,22 @@ instance Applicative Decoder where
 {-# INLINE word8 #-}
 word8 :: Decoder Word8
 word8 =
-  Decoder 1 A.peekWord8
+  codec B.word8
 
 {-# INLINE beWord32 #-}
 beWord32 :: Decoder Word32
 beWord32 =
-  Decoder 4 A.peekBEWord32
-
-{-# INLINE leWord32 #-}
-leWord32 :: Decoder Word32
-leWord32 =
-  Decoder 4 A.peekLEWord32
+  codec B.beWord32
 
 {-# INLINE beWord64 #-}
 beWord64 :: Decoder Word64
 beWord64 =
-  Decoder 8 A.peekBEWord64
-
-{-# INLINE leWord64 #-}
-leWord64 :: Decoder Word64
-leWord64 =
-  Decoder 8 A.peekLEWord64
+  codec B.beWord64
 
 {-# INLINE bytes #-}
 bytes :: Int -> Decoder ByteString
 bytes amount =
-  Decoder amount (\ptr -> A.peekBytes ptr amount)
+  codec (B.bytes amount)
 
 {-# INLINE codec #-}
 codec :: B.Codec input output -> Decoder output

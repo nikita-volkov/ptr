@@ -16,7 +16,7 @@ using Applicative and Profunctor. E.g.,
 >  (,) <$> lmap fst word8 <*> lmap snd beWord32
 -}
 data Codec input output =
-  Codec !Int !(Ptr Word8 -> input -> IO ()) !(Ptr Word8 -> IO output)
+  Codec !Int (Ptr Word8 -> input -> IO ()) (Ptr Word8 -> IO output)
 
 {-|
 A codec, which encodes and decodes the same type. E.g.,

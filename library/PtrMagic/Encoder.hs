@@ -2,7 +2,6 @@ module PtrMagic.Encoder
 where
 
 import PtrMagic.Prelude
-import qualified PtrMagic.IO as A
 import qualified PtrMagic.Codec as B
 
 
@@ -26,22 +25,22 @@ instance Divisible Encoder where
 {-# INLINE word8 #-}
 word8 :: Encoder Word8
 word8 =
-  Encoder 1 A.pokeWord8
+  codec B.word8
 
 {-# INLINE beWord32 #-}
 beWord32 :: Encoder Word32
 beWord32 =
-  Encoder 4 A.pokeBEWord32
+  codec B.beWord32
 
 {-# INLINE beWord64 #-}
 beWord64 :: Encoder Word64
 beWord64 =
-  Encoder 8 A.pokeBEWord64
+  codec B.beWord64
 
 {-# INLINE bytes #-}
 bytes :: Int -> Encoder ByteString
 bytes amount =
-  Encoder amount (\ptr -> A.pokeBytesTrimming ptr amount)
+  codec (B.bytes amount)
 
 {-# INLINE codec #-}
 codec :: B.Codec input output -> Encoder input
