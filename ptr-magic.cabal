@@ -45,6 +45,7 @@ library
     PtrMagic.Receiver
     PtrMagic.Encoding
     PtrMagic.ByteString
+    PtrMagic.Buffer
   other-modules:
     PtrMagic.Receiver.Core
     PtrMagic.Parse
@@ -56,6 +57,7 @@ library
     -- data:
     text == 1.*,
     bytestring >= 0.10 && < 0.11,
+    byte-ring-buffer >= 0.2 && < 0.3,
     -- control:
     semigroups >= 0.18 && < 0.20,
     profunctors >= 5.1 && < 6,
