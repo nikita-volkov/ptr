@@ -49,7 +49,6 @@ library
   other-modules:
     PtrMagic.Receiver.Core
     PtrMagic.Parse
-    PtrMagic.DynamicDecoder
     PtrMagic.IO
     PtrMagic.UncheckedShifting
     PtrMagic.Prelude
