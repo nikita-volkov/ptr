@@ -48,7 +48,6 @@ library
     PtrMagic.Buffer
   other-modules:
     PtrMagic.Receiver.Core
-    PtrMagic.Parse
     PtrMagic.IO
     PtrMagic.UncheckedShifting
     PtrMagic.Prelude
