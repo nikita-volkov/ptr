@@ -39,15 +39,15 @@ library
   default-language:
     Haskell2010
   exposed-modules:
-    PtrMagic.Decoder
-    PtrMagic.Encoder
+    PtrMagic.Decode
+    PtrMagic.Encode
     PtrMagic.Codec
-    PtrMagic.Receiver
+    PtrMagic.Receive
     PtrMagic.Encoding
     PtrMagic.ByteString
     PtrMagic.Buffer
   other-modules:
-    PtrMagic.Receiver.Core
+    PtrMagic.Receive.Core
     PtrMagic.IO
     PtrMagic.UncheckedShifting
     PtrMagic.Prelude

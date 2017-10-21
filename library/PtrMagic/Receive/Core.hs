@@ -1,4 +1,4 @@
-module PtrMagic.Receiver.Core
+module PtrMagic.Receive.Core
 where
 
 import PtrMagic.Prelude
