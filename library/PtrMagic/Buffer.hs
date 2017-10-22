@@ -11,13 +11,13 @@ where
 
 import PtrMagic.Prelude
 import qualified ByteRingBuffer as A
-import qualified PtrMagic.Encoding as B
+import qualified PtrMagic.Poking as B
 import qualified PtrMagic.Peek as C
 
 
 {-# INLINE push #-}
-push :: A.Buffer -> B.Encoding -> IO ()
-push buffer (B.Encoding amount ptrIO) =
+push :: A.Buffer -> B.Poking -> IO ()
+push buffer (B.Poking amount ptrIO) =
   A.push buffer amount ptrIO
 
 {-# INLINE pull #-}

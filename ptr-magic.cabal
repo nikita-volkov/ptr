@@ -44,7 +44,7 @@ library
     PtrMagic.Poke
     PtrMagic.PeekPoke
     PtrMagic.Receive
-    PtrMagic.Encoding
+    PtrMagic.Poking
     PtrMagic.ByteString
     PtrMagic.Buffer
   other-modules:
