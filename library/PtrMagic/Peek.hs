@@ -2,7 +2,7 @@ module PtrMagic.Peek
 where
 
 import PtrMagic.Prelude
-import qualified PtrMagic.Codec as B
+import qualified PtrMagic.PeekPoke as B
 
 
 data Peek output =
@@ -28,24 +28,24 @@ instance Applicative Peek where
 {-# INLINE word8 #-}
 word8 :: Peek Word8
 word8 =
-  codec B.word8
+  peekPoke B.word8
 
 {-# INLINE beWord32 #-}
 beWord32 :: Peek Word32
 beWord32 =
-  codec B.beWord32
+  peekPoke B.beWord32
 
 {-# INLINE beWord64 #-}
 beWord64 :: Peek Word64
 beWord64 =
-  codec B.beWord64
+  peekPoke B.beWord64
 
 {-# INLINE bytes #-}
 bytes :: Int -> Peek ByteString
 bytes amount =
-  codec (B.bytes amount)
+  peekPoke (B.bytes amount)
 
-{-# INLINE codec #-}
-codec :: B.Codec input output -> Peek output
-codec (B.Codec size _ io) =
+{-# INLINE peekPoke #-}
+peekPoke :: B.PeekPoke input output -> Peek output
+peekPoke (B.PeekPoke size _ io) =
   Peek size io

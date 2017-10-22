@@ -9,7 +9,7 @@ import Test.Tasty.QuickCheck
 import Test.QuickCheck.Instances
 import qualified PtrMagic.Poke as B
 import qualified PtrMagic.Peek as C
-import qualified PtrMagic.Codec as E
+import qualified PtrMagic.PeekPoke as E
 import qualified Data.ByteString as D
 
 
@@ -25,7 +25,7 @@ main =
     ,
     testProperty "Poke and peek (beWord64)" $ \input -> input === fromJust (pokeAndPeek B.beWord64 C.beWord64) input
     ,
-    testProperty "Codec composition" $ \input -> input === codec ((,) <$> lmap fst E.word8 <*> lmap snd E.beWord32) input
+    testProperty "PeekPoke composition" $ \input -> input === peekPoke ((,) <$> lmap fst E.word8 <*> lmap snd E.beWord32) input
   ]
 
 pokeAndPeek :: B.Poke a -> C.Peek a -> Maybe (a -> a)
@@ -38,8 +38,8 @@ pokeAndPeek (B.Poke pokeSize pokeIO) (C.Peek peekSize peekIO) =
         pokeIO p input
         peekIO p
 
-codec :: E.Codec input output -> input -> output
-codec (E.Codec size poke peek) input =
+peekPoke :: E.PeekPoke input output -> input -> output
+peekPoke (E.PeekPoke size poke peek) input =
   unsafePerformIO $ do
     fp <- mallocForeignPtrBytes size
     withForeignPtr fp $ \p -> do
