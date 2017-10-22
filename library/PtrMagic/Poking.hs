@@ -4,7 +4,7 @@ where
 import PtrMagic.Prelude
 import qualified PtrMagic.IO as A
 import qualified PtrMagic.Poke as C
-import qualified PtrMagic.PeekPoke as D
+import qualified PtrMagic.PokeAndPeek as D
 import qualified Data.ByteString.Internal as B
 
 
@@ -75,7 +75,7 @@ poke :: C.Poke input -> input -> Poking
 poke (C.Poke space poke) input =
   Poking space (\ptr -> poke ptr input)
 
-{-# INLINE peekPoke #-}
-peekPoke :: D.PeekPoke input output -> input -> Poking
-peekPoke (D.PeekPoke space poke _) input =
+{-# INLINE pokeAndPeek #-}
+pokeAndPeek :: D.PokeAndPeek input output -> input -> Poking
+pokeAndPeek (D.PokeAndPeek space poke _) input =
   Poking space (\ptr -> poke ptr input)

@@ -42,7 +42,7 @@ library
     PtrMagic.Peek
     PtrMagic.Take
     PtrMagic.Poke
-    PtrMagic.PeekPoke
+    PtrMagic.PokeAndPeek
     PtrMagic.Receive
     PtrMagic.Poking
     PtrMagic.ByteString

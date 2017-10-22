@@ -2,7 +2,7 @@ module PtrMagic.Poke
 where
 
 import PtrMagic.Prelude
-import qualified PtrMagic.PeekPoke as B
+import qualified PtrMagic.PokeAndPeek as B
 
 
 data Poke input =
@@ -25,29 +25,29 @@ instance Divisible Poke where
 {-# INLINE word8 #-}
 word8 :: Poke Word8
 word8 =
-  peekPoke B.word8
+  pokeAndPeek B.word8
 
 {-# INLINE beWord16 #-}
 beWord16 :: Poke Word16
 beWord16 =
-  peekPoke B.beWord16
+  pokeAndPeek B.beWord16
 
 {-# INLINE beWord32 #-}
 beWord32 :: Poke Word32
 beWord32 =
-  peekPoke B.beWord32
+  pokeAndPeek B.beWord32
 
 {-# INLINE beWord64 #-}
 beWord64 :: Poke Word64
 beWord64 =
-  peekPoke B.beWord64
+  pokeAndPeek B.beWord64
 
 {-# INLINE bytes #-}
 bytes :: Int -> Poke ByteString
 bytes amount =
-  peekPoke (B.bytes amount)
+  pokeAndPeek (B.bytes amount)
 
-{-# INLINE peekPoke #-}
-peekPoke :: B.PeekPoke input output -> Poke input
-peekPoke (B.PeekPoke size io _) =
+{-# INLINE pokeAndPeek #-}
+pokeAndPeek :: B.PokeAndPeek input output -> Poke input
+pokeAndPeek (B.PokeAndPeek size io _) =
   Poke size io

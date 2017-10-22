@@ -2,7 +2,7 @@ module PtrMagic.Peek
 where
 
 import PtrMagic.Prelude
-import qualified PtrMagic.PeekPoke as B
+import qualified PtrMagic.PokeAndPeek as B
 
 
 data Peek output =
@@ -28,29 +28,29 @@ instance Applicative Peek where
 {-# INLINE word8 #-}
 word8 :: Peek Word8
 word8 =
-  peekPoke B.word8
+  pokeAndPeek B.word8
 
 {-# INLINE beWord16 #-}
 beWord16 :: Peek Word16
 beWord16 =
-  peekPoke B.beWord16
+  pokeAndPeek B.beWord16
 
 {-# INLINE beWord32 #-}
 beWord32 :: Peek Word32
 beWord32 =
-  peekPoke B.beWord32
+  pokeAndPeek B.beWord32
 
 {-# INLINE beWord64 #-}
 beWord64 :: Peek Word64
 beWord64 =
-  peekPoke B.beWord64
+  pokeAndPeek B.beWord64
 
 {-# INLINE bytes #-}
 bytes :: Int -> Peek ByteString
 bytes amount =
-  peekPoke (B.bytes amount)
+  pokeAndPeek (B.bytes amount)
 
-{-# INLINE peekPoke #-}
-peekPoke :: B.PeekPoke input output -> Peek output
-peekPoke (B.PeekPoke size _ io) =
+{-# INLINE pokeAndPeek #-}
+pokeAndPeek :: B.PokeAndPeek input output -> Peek output
+pokeAndPeek (B.PokeAndPeek size _ io) =
   Peek size io
