@@ -3,7 +3,7 @@ where
 
 import PtrMagic.Prelude
 import qualified PtrMagic.IO as A
-import qualified PtrMagic.Encode as C
+import qualified PtrMagic.Poke as C
 import qualified PtrMagic.Codec as D
 import qualified Data.ByteString.Internal as B
 
@@ -70,9 +70,9 @@ bytes :: ByteString -> Encoding
 bytes (B.PS bytesFPtr offset length) =
   Encoding length (\ptr -> withForeignPtr bytesFPtr (\bytesPtr -> B.memcpy ptr (plusPtr bytesPtr offset) length))
 
-{-# INLINE encode #-}
-encode :: C.Encode input -> input -> Encoding
-encode (C.Encode space poke) input =
+{-# INLINE poke #-}
+poke :: C.Poke input -> input -> Encoding
+poke (C.Poke space poke) input =
   Encoding space (\ptr -> poke ptr input)
 
 {-# INLINE codec #-}

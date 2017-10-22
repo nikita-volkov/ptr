@@ -2,13 +2,13 @@ module PtrMagic.Receive
 (
   Receive,
   create,
-  decode,
+  peek,
 )
 where
 
-import PtrMagic.Prelude
+import PtrMagic.Prelude hiding (peek)
 import qualified PtrMagic.Receive.Core as A
-import qualified PtrMagic.Decode as B
+import qualified PtrMagic.Peek as B
 
 
 {-|
@@ -35,6 +35,6 @@ Receive as many bytes as is required by the provided decoder and decode immediat
 
 If all you need is just to get a 'ByteString' chunk then use the 'B.bytes' decoder.
 -}
-decode :: Receive -> B.Decode decoded -> IO (Either Text decoded)
-decode (Receive fetch bufferFP bufferStateRef chunkSize) (B.Decode amount action) =
-  A.decode fetch bufferFP bufferStateRef chunkSize amount action
+peek :: Receive -> B.Peek peekd -> IO (Either Text peekd)
+peek (Receive fetch bufferFP bufferStateRef chunkSize) (B.Peek amount action) =
+  A.peek fetch bufferFP bufferStateRef chunkSize amount action

@@ -39,9 +39,9 @@ library
   default-language:
     Haskell2010
   exposed-modules:
-    PtrMagic.Decode
+    PtrMagic.Peek
     PtrMagic.Take
-    PtrMagic.Encode
+    PtrMagic.Poke
     PtrMagic.Codec
     PtrMagic.Receive
     PtrMagic.Encoding

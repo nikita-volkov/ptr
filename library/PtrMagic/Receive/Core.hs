@@ -64,8 +64,8 @@ fetchMany fetch bufferFP bufferStateRef chunkSize remaining destination =
               then return (Left "End of input")
               else handle amountFetched
 
-decode :: (Ptr Word8 -> Int -> IO (Either Text Int)) -> ForeignPtr Word8 -> IORef (Int, Int) -> Int -> Int -> (Ptr Word8 -> IO decoded) -> IO (Either Text decoded)
-decode fetch bufferFP bufferStateRef chunkSize howMany decode =
+peek :: (Ptr Word8 -> Int -> IO (Either Text Int)) -> ForeignPtr Word8 -> IORef (Int, Int) -> Int -> Int -> (Ptr Word8 -> IO peekd) -> IO (Either Text peekd)
+peek fetch bufferFP bufferStateRef chunkSize howMany peek =
   do
     (offset, end) <- readIORef bufferStateRef
     let
@@ -75,9 +75,9 @@ decode fetch bufferFP bufferStateRef chunkSize howMany decode =
           -- We have enough bytes in the buffer, so need not to allocate anything and can directly decode from the buffer
           withForeignPtr bufferFP $ \bufferPtr ->
           do
-            decoded <- decode bufferPtr
+            peekd <- peek bufferPtr
             writeIORef bufferStateRef (offset + howMany, end)
-            return (Right decoded)
+            return (Right peekd)
         else
           -- We have to allocate a temporary space to prefetch the data into
           allocaBytes howMany $ \tmpPtr ->
@@ -95,6 +95,6 @@ decode fetch bufferFP bufferStateRef chunkSize howMany decode =
                     fetchMany fetch bufferFP bufferStateRef chunkSize (howMany - amountInBuffer) (plusPtr tmpPtr amountInBuffer)
             case writeResult of
               Right () -> do
-                decoded <- decode tmpPtr
-                return (Right decoded)
+                peekd <- peek tmpPtr
+                return (Right peekd)
               Left msg -> return (Left msg)
