@@ -30,6 +30,11 @@ word8 :: Peek Word8
 word8 =
   peekPoke B.word8
 
+{-# INLINE beWord16 #-}
+beWord16 :: Peek Word16
+beWord16 =
+  peekPoke B.beWord16
+
 {-# INLINE beWord32 #-}
 beWord32 :: Peek Word32
 beWord32 =

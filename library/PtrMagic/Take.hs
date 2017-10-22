@@ -21,6 +21,11 @@ word8 :: Take Word8
 word8 =
   peek A.word8
 
+{-# INLINE beWord16 #-}
+beWord16 :: Take Word16
+beWord16 =
+  peek A.beWord16
+
 {-# INLINE beWord32 #-}
 beWord32 :: Take Word32
 beWord32 =

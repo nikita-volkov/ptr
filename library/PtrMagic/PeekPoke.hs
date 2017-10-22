@@ -56,6 +56,11 @@ word8 :: InvPeekPoke Word8
 word8 =
   PeekPoke 1 A.pokeWord8 A.peekWord8
 
+{-# INLINE beWord16 #-}
+beWord16 :: InvPeekPoke Word16
+beWord16 =
+  PeekPoke 2 A.pokeBEWord16 A.peekBEWord16
+
 {-# INLINE beWord32 #-}
 beWord32 :: InvPeekPoke Word32
 beWord32 =
