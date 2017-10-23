@@ -3,6 +3,7 @@ where
 
 import PtrMagic.Prelude
 import qualified PtrMagic.PokeAndPeek as B
+import qualified PtrMagic.Take as C
 
 
 data Peek output =
@@ -54,3 +55,8 @@ bytes amount =
 pokeAndPeek :: B.PokeAndPeek input output -> Peek output
 pokeAndPeek (B.PokeAndPeek size _ io) =
   Peek size io
+
+{-# INLINE take #-}
+take :: Int -> C.Take a -> Peek (Maybe a)
+take amount (C.Take (StateT maybeT)) =
+  Peek amount (\ptr -> case maybeT (amount, ptr) of MaybeT io -> fmap (fmap (\ (result, _) -> result)) io)
