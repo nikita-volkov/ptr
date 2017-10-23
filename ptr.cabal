@@ -1,7 +1,7 @@
 name:
   ptr
 version:
-  0.12
+  0.12.1
 category:
   Ptr, Data
 synopsis:
@@ -56,7 +56,7 @@ library
     -- data:
     text == 1.*,
     bytestring >= 0.10 && < 0.11,
-    buffer >= 0.3 && < 0.4,
+    buffer >= 0.4 && < 0.5,
     -- control:
     semigroups >= 0.18 && < 0.20,
     profunctors >= 5.1 && < 6,
