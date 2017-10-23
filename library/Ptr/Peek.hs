@@ -56,6 +56,11 @@ pokeAndPeek :: B.PokeAndPeek input output -> Peek output
 pokeAndPeek (B.PokeAndPeek size _ io) =
   Peek size io
 
+{-|
+Given the length of the data and a specification of its sequential consumption,
+produces Peek, which results in Just the successfully taken value,
+or Nothing, the specified length of data wasn't enough.
+-}
 {-# INLINE take #-}
 take :: Int -> C.Take a -> Peek (Maybe a)
 take amount (C.Take (StateT maybeT)) =
