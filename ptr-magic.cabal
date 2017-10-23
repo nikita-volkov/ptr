@@ -56,7 +56,7 @@ library
     -- data:
     text == 1.*,
     bytestring >= 0.10 && < 0.11,
-    byte-ring-buffer >= 0.2 && < 0.3,
+    buffer >= 0.3 && < 0.4,
     -- control:
     semigroups >= 0.18 && < 0.20,
     profunctors >= 5.1 && < 6,

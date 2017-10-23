@@ -10,7 +10,7 @@ module PtrMagic.Buffer
 where
 
 import PtrMagic.Prelude
-import qualified ByteRingBuffer as A
+import qualified Buffer as A
 import qualified PtrMagic.Poking as B
 import qualified PtrMagic.Peek as C
 
