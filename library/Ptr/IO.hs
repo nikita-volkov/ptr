@@ -1,10 +1,10 @@
 {-# LANGUAGE CPP #-}
-module PtrMagic.IO
+module Ptr.IO
 where
 
-import PtrMagic.Prelude
+import Ptr.Prelude
 import qualified Data.ByteString.Internal as A
-import qualified PtrMagic.UncheckedShifting as D
+import qualified Ptr.UncheckedShifting as D
 
 
 {-# INLINE peekStorable #-}

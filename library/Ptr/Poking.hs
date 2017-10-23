@@ -1,10 +1,10 @@
-module PtrMagic.Poking
+module Ptr.Poking
 where
 
-import PtrMagic.Prelude
-import qualified PtrMagic.IO as A
-import qualified PtrMagic.Poke as C
-import qualified PtrMagic.PokeAndPeek as D
+import Ptr.Prelude
+import qualified Ptr.IO as A
+import qualified Ptr.Poke as C
+import qualified Ptr.PokeAndPeek as D
 import qualified Data.ByteString.Internal as B
 
 

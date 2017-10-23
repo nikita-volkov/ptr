@@ -1,4 +1,4 @@
-module PtrMagic.Prelude
+module Ptr.Prelude
 (
   module Exports,
 )

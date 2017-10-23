@@ -1,4 +1,4 @@
-module PtrMagic.Receive
+module Ptr.Receive
 (
   Receive,
   create,
@@ -6,9 +6,9 @@ module PtrMagic.Receive
 )
 where
 
-import PtrMagic.Prelude hiding (peek)
-import qualified PtrMagic.Receive.Core as A
-import qualified PtrMagic.Peek as B
+import Ptr.Prelude hiding (peek)
+import qualified Ptr.Receive.Core as A
+import qualified Ptr.Peek as B
 
 
 {-|

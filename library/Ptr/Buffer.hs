@@ -1,4 +1,4 @@
-module PtrMagic.Buffer
+module Ptr.Buffer
 (
   A.Buffer,
   A.new,
@@ -9,10 +9,10 @@ module PtrMagic.Buffer
 )
 where
 
-import PtrMagic.Prelude
+import Ptr.Prelude
 import qualified Buffer as A
-import qualified PtrMagic.Poking as B
-import qualified PtrMagic.Peek as C
+import qualified Ptr.Poking as B
+import qualified Ptr.Peek as C
 
 
 {-# INLINE push #-}

@@ -1,8 +1,8 @@
-module PtrMagic.Poke
+module Ptr.Poke
 where
 
-import PtrMagic.Prelude
-import qualified PtrMagic.PokeAndPeek as B
+import Ptr.Prelude
+import qualified Ptr.PokeAndPeek as B
 
 
 data Poke input =

@@ -1,10 +1,10 @@
-module PtrMagic.Take
+module Ptr.Take
 where
 
-import PtrMagic.Prelude hiding (peek, take)
-import qualified PtrMagic.PokeAndPeek as A
+import Ptr.Prelude hiding (peek, take)
+import qualified Ptr.PokeAndPeek as A
 import qualified Data.ByteString.Char8 as B
-import qualified PtrMagic.Prelude as C
+import qualified Ptr.Prelude as C
 
 
 newtype Take output =

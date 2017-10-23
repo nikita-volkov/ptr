@@ -7,9 +7,9 @@ import Test.Tasty.Runners
 import Test.Tasty.HUnit
 import Test.Tasty.QuickCheck
 import Test.QuickCheck.Instances
-import qualified PtrMagic.Poke as B
-import qualified PtrMagic.Peek as C
-import qualified PtrMagic.PokeAndPeek as E
+import qualified Ptr.Poke as B
+import qualified Ptr.Peek as C
+import qualified Ptr.PokeAndPeek as E
 import qualified Data.ByteString as D
 
 

@@ -1,7 +1,7 @@
-module PtrMagic.Receive.Core
+module Ptr.Receive.Core
 where
 
-import PtrMagic.Prelude
+import Ptr.Prelude
 import qualified Data.ByteString.Internal as A
 
 

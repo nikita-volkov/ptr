@@ -1,8 +1,8 @@
-module PtrMagic.PokeAndPeek
+module Ptr.PokeAndPeek
 where
 
-import PtrMagic.Prelude
-import qualified PtrMagic.IO as A
+import Ptr.Prelude
+import qualified Ptr.IO as A
 
 
 {-|

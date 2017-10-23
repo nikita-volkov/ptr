@@ -1,9 +1,9 @@
-module PtrMagic.Peek
+module Ptr.Peek
 where
 
-import PtrMagic.Prelude
-import qualified PtrMagic.PokeAndPeek as B
-import qualified PtrMagic.Take as C
+import Ptr.Prelude
+import qualified Ptr.PokeAndPeek as B
+import qualified Ptr.Take as C
 
 
 data Peek output =

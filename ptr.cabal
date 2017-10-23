@@ -1,15 +1,15 @@
 name:
-  ptr-magic
+  ptr
 version:
-  0.11
+  0.12
 category:
   Ptr, Data
 synopsis:
   Abstractions for operations on pointers
 homepage:
-  https://github.com/nikita-volkov/ptr-magic 
+  https://github.com/nikita-volkov/ptr 
 bug-reports:
-  https://github.com/nikita-volkov/ptr-magic/issues 
+  https://github.com/nikita-volkov/ptr/issues 
 author:
   Nikita Volkov <nikita.y.volkov@mail.ru>
 maintainer:
@@ -29,7 +29,7 @@ source-repository head
   type:
     git
   location:
-    git://github.com/nikita-volkov/ptr-magic.git
+    git://github.com/nikita-volkov/ptr.git
 
 library
   hs-source-dirs:
@@ -39,19 +39,19 @@ library
   default-language:
     Haskell2010
   exposed-modules:
-    PtrMagic.Peek
-    PtrMagic.Take
-    PtrMagic.Poke
-    PtrMagic.PokeAndPeek
-    PtrMagic.Receive
-    PtrMagic.Poking
-    PtrMagic.ByteString
-    PtrMagic.Buffer
+    Ptr.Peek
+    Ptr.Take
+    Ptr.Poke
+    Ptr.PokeAndPeek
+    Ptr.Receive
+    Ptr.Poking
+    Ptr.ByteString
+    Ptr.Buffer
   other-modules:
-    PtrMagic.Receive.Core
-    PtrMagic.IO
-    PtrMagic.UncheckedShifting
-    PtrMagic.Prelude
+    Ptr.Receive.Core
+    Ptr.IO
+    Ptr.UncheckedShifting
+    Ptr.Prelude
   build-depends:
     -- data:
     text == 1.*,
@@ -86,7 +86,7 @@ test-suite tests
     Haskell2010
   build-depends:
     --
-    ptr-magic,
+    ptr,
     -- testing:
     tasty == 0.11.*,
     tasty-quickcheck == 0.8.*,

@@ -1,8 +1,8 @@
-module PtrMagic.ByteString
+module Ptr.ByteString
 where
 
-import PtrMagic.Prelude
-import qualified PtrMagic.Poking as A
+import Ptr.Prelude
+import qualified Ptr.Poking as A
 import qualified Data.ByteString.Internal as B
 
 
