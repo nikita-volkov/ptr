@@ -9,7 +9,7 @@ import qualified Ptr.Prelude as C
 
 newtype Take output =
   Take (StateT (Int, Ptr Word8) (MaybeT IO) output)
-  deriving (Functor, Applicative, Monad)
+  deriving (Functor, Applicative, Monad, Alternative, MonadPlus)
 
 {-# INLINE take #-}
 take :: (Int -> Ptr Word8 -> IO (Maybe (a, (Int, Ptr Word8)))) -> Take a
