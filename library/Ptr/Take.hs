@@ -5,6 +5,7 @@ import Ptr.Prelude hiding (peek, take)
 import qualified Ptr.PokeAndPeek as A
 import qualified Data.ByteString.Char8 as B
 import qualified Ptr.Prelude as C
+import qualified Ptr.IO as D
 
 
 newtype Take output =
@@ -50,6 +51,13 @@ beWord64 =
 bytes :: Int -> Take ByteString
 bytes amount =
   pokeAndPeek (A.bytes amount)
+
+{-# INLINE allBytes #-}
+allBytes :: Take ByteString
+allBytes =
+  take $ \availableAmount ptr -> do
+    bytes <- D.peekBytes ptr availableAmount
+    return (Just (bytes, (0, plusPtr ptr availableAmount)))
 
 {-# INLINE nullTerminatedBytes #-}
 nullTerminatedBytes :: Take ByteString
