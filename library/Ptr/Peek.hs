@@ -1,7 +1,7 @@
 module Ptr.Peek
 where
 
-import Ptr.Prelude
+import Ptr.Prelude hiding (take)
 import qualified Ptr.PokeAndPeek as B
 import qualified Ptr.Take as C
 
@@ -65,3 +65,14 @@ or Nothing, the specified length of data wasn't enough.
 take :: Int -> C.Take a -> Peek (Maybe a)
 take amount (C.Take (StateT maybeT)) =
   Peek amount (\ptr -> case maybeT (amount, ptr) of MaybeT io -> fmap (fmap (\ (result, _) -> result)) io)
+
+{-|
+A standard idiom, where a header specifies the length of the body.
+
+Produces Peek, which itself produces another Peek, which is the same as the result of the 'take' function.
+-}
+{-# INLINE peekAmountAndTake #-}
+peekAmountAndTake :: Peek Int -> C.Take a -> Peek (Peek (Maybe a))
+peekAmountAndTake peekAmount take_ =
+  flip fmap peekAmount $ \amount ->
+  take amount take_
