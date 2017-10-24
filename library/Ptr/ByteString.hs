@@ -14,17 +14,12 @@ poking (A.Poking size population) =
   B.unsafeCreate size population
 
 {-# INLINE take #-}
-take :: B.ByteString -> C.Take result -> Maybe result
-take (B.PS fp offset length) (C.Take (StateT maybeT)) =
+take :: B.ByteString -> C.Take result -> (Int -> result) -> (Text -> result) -> result
+take (B.PS fp offset length) (C.Take takeIO) eoi error =
   {-# SCC "take" #-} 
   unsafePerformIO $
   withForeignPtr fp $ \ptr ->
-  case maybeT (length, plusPtr ptr offset) of
-    MaybeT maybeIO -> do
-      maybe <- maybeIO
-      case maybe of
-        Just (!result, _) -> return (Just result)
-        Nothing -> return Nothing
+  takeIO length (plusPtr ptr offset) (return . eoi) (return . error) (\result _ _ -> return result)
 
 {-# INLINE peek #-}
 peek :: B.ByteString -> D.Peek result -> Maybe result

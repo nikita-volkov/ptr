@@ -9,23 +9,58 @@ import qualified Ptr.IO as D
 
 
 newtype Take output =
-  Take (StateT (Int, Ptr Word8) (MaybeT IO) output)
-  deriving (Functor, Applicative, Monad, Alternative, MonadPlus)
+  Take (Int -> Ptr Word8 -> forall result. (Int -> IO result) -> (Text -> IO result) -> (output -> Int -> Ptr Word8 -> IO result) -> IO result)
 
-{-# INLINE take #-}
-take :: (Int -> Ptr Word8 -> IO (Maybe (a, (Int, Ptr Word8)))) -> Take a
-take io =
-  Take (StateT (\(!availableAmount, !ptr) -> MaybeT (io availableAmount ptr)))
+deriving instance Functor Take
+
+instance Applicative Take where
+  pure x =
+    Take (\ availableAmount ptr _ _ succeed -> succeed x availableAmount ptr)
+  {-# INLINE (<*>) #-}
+  (<*>) (Take left) (Take right) =
+    Take $ \ availableAmount ptr failWithEOI failWithMessage succeed ->
+    left availableAmount ptr failWithEOI failWithMessage $ \ leftOutput leftAvailableAmount leftPtr ->
+    right leftAvailableAmount leftPtr failWithEOI failWithMessage $ \ rightOutput rightAvailableAmount rightPtr ->
+    succeed (leftOutput rightOutput) rightAvailableAmount rightPtr
+
+instance Alternative Take where
+  empty =
+    Take (\ _ _ failWithEOI _ _ -> failWithEOI 0)
+  {-# INLINE (<|>) #-}
+  (<|>) (Take left) (Take right) =
+    Take $ \ availableAmount ptr failWithEOI failWithMessage succeed ->
+    left availableAmount ptr 
+      (\ _ -> right availableAmount ptr failWithEOI failWithMessage succeed)
+      failWithMessage succeed
+
+instance Monad Take where
+  return = pure
+  {-# INLINE (>>=) #-}
+  (>>=) (Take left) rightK =
+    Take $ \ availableAmount ptr failWithEOI failWithMessage succeed ->
+    left availableAmount ptr failWithEOI failWithMessage $ \ leftOutput leftAvailableAmount leftPtr ->
+    case rightK leftOutput of
+      Take right ->
+        right leftAvailableAmount leftPtr failWithEOI failWithMessage succeed
+
+instance MonadPlus Take where
+  mzero = empty
+  mplus = (<|>)
+
+{-# INLINE fail #-}
+fail :: Text -> Take output
+fail message =
+  Take $ \ _ _ _ failWithMessage _ -> failWithMessage message
 
 {-# INLINE pokeAndPeek #-}
 pokeAndPeek :: A.PokeAndPeek input output -> Take output
 pokeAndPeek (A.PokeAndPeek requiredAmount _ ptrIO) =
-  take $ \availableAmount ptr ->
+  Take $ \ !availableAmount !ptr failWithEOI failWithMessage succeed ->
   if availableAmount >= requiredAmount
     then do
-      result <- ptrIO ptr
-      return (Just (result, (availableAmount - requiredAmount, plusPtr ptr requiredAmount)))
-    else return Nothing
+      !result <- ptrIO ptr
+      succeed result (availableAmount - requiredAmount) (plusPtr ptr requiredAmount)
+    else failWithEOI (requiredAmount - availableAmount)
 
 {-# INLINE word8 #-}
 word8 :: Take Word8
@@ -61,27 +96,27 @@ bytes amount =
 allBytes :: Take ByteString
 allBytes =
   {-# SCC "allBytes" #-} 
-  take $ \availableAmount ptr -> do
+  Take $ \ !availableAmount !ptr failWithEOI failWithMessage succeed -> do
     bytes <- D.peekBytes ptr availableAmount
-    return (Just (bytes, (0, plusPtr ptr availableAmount)))
+    succeed bytes 0 (plusPtr ptr availableAmount)
 
 {-# INLINE nullTerminatedBytes #-}
 nullTerminatedBytes :: Take ByteString
 nullTerminatedBytes =
-  {-# SCC "nullTerminatedBytes" #-} 
-  take $ \availableAmount ptr -> do
+  {-# SCC "nullTerminatedBytes" #-}
+  Take $ \ !availableAmount !ptr failWithEOI failWithMessage succeed -> do
     bytes <- B.packCString (castPtr ptr)
     case succ (B.length bytes) of
       consumedAmount -> if consumedAmount <= availableAmount
-        then return (Just (bytes, (availableAmount - consumedAmount, plusPtr ptr consumedAmount)))
-        else return Nothing
+        then succeed bytes (availableAmount - consumedAmount) (plusPtr ptr consumedAmount)
+        else failWithEOI (consumedAmount - availableAmount)
 
 {-# INLINE bytesWhile #-}
 bytesWhile :: (Word8 -> Bool) -> Take ByteString
 bytesWhile predicate =
-  {-# SCC "bytesWhile" #-} 
-  take (\availableAmount -> iterate availableAmount availableAmount)
-  where
+  {-# SCC "bytesWhile" #-}
+  Take $ \ !availableAmount !ptr failWithEOI failWithMessage succeed ->
+  let
     iterate !availableAmount !unconsumedAmount !ptr =
       if unconsumedAmount > 0
         then do
@@ -90,38 +125,41 @@ bytesWhile predicate =
             then iterate availableAmount (pred unconsumedAmount) (plusPtr ptr 1)
             else do
               bytes <- B.packCStringLen (castPtr ptr, availableAmount - unconsumedAmount)
-              return (Just (bytes, (unconsumedAmount, ptr)))
-        else return Nothing
+              succeed bytes unconsumedAmount ptr
+        else failWithEOI 0
+    in iterate availableAmount availableAmount ptr
 
 {-# INLINE skipWhile #-}
 skipWhile :: (Word8 -> Bool) -> Take ()
 skipWhile predicate =
   {-# SCC "skipWhile" #-} 
-  take (\availableAmount -> iterate availableAmount availableAmount)
-  where
+  Take $ \ !availableAmount !ptr failWithEOI failWithMessage succeed ->
+  let
     iterate !availableAmount !unconsumedAmount !ptr =
       if unconsumedAmount > 0
         then do
           byte <- C.peek ptr
           if predicate byte
             then iterate availableAmount (pred unconsumedAmount) (plusPtr ptr 1)
-            else return (Just ((), (unconsumedAmount, ptr)))
-        else return Nothing
+            else succeed () unconsumedAmount ptr
+        else failWithEOI 0
+    in iterate availableAmount availableAmount ptr
 
 {-# INLINE foldWhile #-}
 foldWhile :: (Word8 -> Bool) -> (state -> Word8 -> state) -> state -> Take state
 foldWhile predicate step start =
   {-# SCC "foldWhile" #-} 
-  take (iterate start)
-  where
+  Take $ \ !availableAmount !ptr failWithEOI failWithMessage succeed ->
+  let
     iterate !state !unconsumedAmount !ptr =
       if unconsumedAmount > 0
         then do
           byte <- C.peek ptr
           if predicate byte
             then iterate (step state byte) (pred unconsumedAmount) (plusPtr ptr 1)
-            else return (Just (state, (unconsumedAmount, ptr)))
-        else return Nothing
+            else succeed state unconsumedAmount ptr
+        else failWithEOI 0
+    in iterate start availableAmount ptr
 
 -- |
 -- Unsigned integral number encoded in ASCII.

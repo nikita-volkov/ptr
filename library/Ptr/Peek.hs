@@ -68,16 +68,11 @@ produces Peek, which results in Just the successfully taken value,
 or Nothing, the specified length of data wasn't enough.
 -}
 {-# INLINE take #-}
-take :: Int -> C.Take a -> Peek (Maybe a)
-take amount (C.Take (StateT maybeT)) =
+take :: Int -> C.Take a -> (Int -> a) -> (Text -> a) -> Peek a
+take amount (C.Take takeIO) eoi error =
   {-# SCC "take" #-} 
   Peek amount $ \ptr ->
-  case maybeT (amount, ptr) of
-    MaybeT io -> do
-      maybe <- io
-      case maybe of
-        Just (!result, _) -> return (Just result)
-        Nothing -> return Nothing
+  takeIO amount ptr (return . eoi) (return . error) (\result _ _ -> return result)
 
 {-|
 A standard idiom, where a header specifies the length of the body.
@@ -85,8 +80,8 @@ A standard idiom, where a header specifies the length of the body.
 Produces Peek, which itself produces another Peek, which is the same as the result of the 'take' function.
 -}
 {-# INLINE peekAmountAndTake #-}
-peekAmountAndTake :: Peek Int -> C.Take a -> Peek (Peek (Maybe a))
-peekAmountAndTake peekAmount take_ =
+peekAmountAndTake :: Peek Int -> C.Take a -> (Int -> a) -> (Text -> a) -> Peek (Peek a)
+peekAmountAndTake peekAmount take_ eoi error =
   {-# SCC "peekAmountAndTake" #-} 
   flip fmap peekAmount $ \amount ->
-  take amount take_
+  take amount take_ eoi error
