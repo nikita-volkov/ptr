@@ -5,6 +5,9 @@ import Ptr.Prelude
 import qualified Ptr.PokeAndPeek as B
 
 
+{-|
+Specification of a sized and errorless writing action to a pointer.
+-}
 data Poke input =
   Poke !Int !(Ptr Word8 -> input -> IO ())
 
