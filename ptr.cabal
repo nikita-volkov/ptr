@@ -1,7 +1,7 @@
 name:
   ptr
 version:
-  0.12.4
+  0.13
 category:
   Ptr, Data
 synopsis:
@@ -40,7 +40,7 @@ library
     Haskell2010
   exposed-modules:
     Ptr.Peek
-    Ptr.Take
+    Ptr.Parse
     Ptr.Poke
     Ptr.PokeAndPeek
     Ptr.Receive

@@ -3,7 +3,7 @@ where
 
 import Ptr.Prelude hiding (take)
 import qualified Ptr.PokeAndPeek as B
-import qualified Ptr.Take as C
+import qualified Ptr.Parse as C
 
 
 data Peek output =
@@ -61,18 +61,18 @@ Given the length of the data and a specification of its sequential consumption,
 produces Peek, which results in Just the successfully taken value,
 or Nothing, the specified length of data wasn't enough.
 -}
-{-# INLINE take #-}
-take :: Int -> C.Take a -> Peek (Maybe a)
-take amount (C.Take (StateT maybeT)) =
-  Peek amount (\ptr -> case maybeT (amount, ptr) of MaybeT io -> fmap (fmap (\ (result, _) -> result)) io)
+{-# INLINE parse #-}
+parse :: Int -> C.Parse a -> Peek (Either Text a)
+parse amount (C.Parse (StateT exceptT)) =
+  Peek amount (\ptr -> case exceptT (amount, ptr) of ExceptT io -> fmap (fmap (\ (result, _) -> result)) io)
 
 {-|
 A standard idiom, where a header specifies the length of the body.
 
 Produces Peek, which itself produces another Peek, which is the same as the result of the 'take' function.
 -}
-{-# INLINE peekAmountAndTake #-}
-peekAmountAndTake :: Peek Int -> C.Take a -> Peek (Peek (Maybe a))
-peekAmountAndTake peekAmount take_ =
+{-# INLINE peekAmountAndParse #-}
+peekAmountAndParse :: Peek Int -> C.Parse a -> Peek (Peek (Either Text a))
+peekAmountAndParse peekAmount take_ =
   flip fmap peekAmount $ \amount ->
-  take amount take_
+  parse amount take_
