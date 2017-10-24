@@ -15,11 +15,13 @@ newtype Take output =
 {-# INLINE take #-}
 take :: (Int -> Ptr Word8 -> IO (Maybe (a, (Int, Ptr Word8)))) -> Take a
 take io =
+  {-# SCC "take" #-} 
   Take (StateT (\(availableAmount, ptr) -> MaybeT (io availableAmount ptr)))
 
 {-# INLINE pokeAndPeek #-}
 pokeAndPeek :: A.PokeAndPeek input output -> Take output
 pokeAndPeek (A.PokeAndPeek requiredAmount _ ptrIO) =
+  {-# SCC "pokeAndPeek" #-} 
   take $ \availableAmount ptr ->
   if availableAmount >= requiredAmount
     then do
@@ -30,31 +32,37 @@ pokeAndPeek (A.PokeAndPeek requiredAmount _ ptrIO) =
 {-# INLINE word8 #-}
 word8 :: Take Word8
 word8 =
+  {-# SCC "word8" #-} 
   pokeAndPeek A.word8
 
 {-# INLINE beWord16 #-}
 beWord16 :: Take Word16
 beWord16 =
+  {-# SCC "beWord16" #-} 
   pokeAndPeek A.beWord16
 
 {-# INLINE beWord32 #-}
 beWord32 :: Take Word32
 beWord32 =
+  {-# SCC "beWord32" #-} 
   pokeAndPeek A.beWord32
 
 {-# INLINE beWord64 #-}
 beWord64 :: Take Word64
 beWord64 =
+  {-# SCC "beWord64" #-} 
   pokeAndPeek A.beWord64
 
 {-# INLINE bytes #-}
 bytes :: Int -> Take ByteString
 bytes amount =
+  {-# SCC "bytes" #-} 
   pokeAndPeek (A.bytes amount)
 
 {-# INLINE allBytes #-}
 allBytes :: Take ByteString
 allBytes =
+  {-# SCC "allBytes" #-} 
   take $ \availableAmount ptr -> do
     bytes <- D.peekBytes ptr availableAmount
     return (Just (bytes, (0, plusPtr ptr availableAmount)))
@@ -62,6 +70,7 @@ allBytes =
 {-# INLINE nullTerminatedBytes #-}
 nullTerminatedBytes :: Take ByteString
 nullTerminatedBytes =
+  {-# SCC "nullTerminatedBytes" #-} 
   take $ \availableAmount ptr -> do
     bytes <- B.packCString (castPtr ptr)
     case succ (B.length bytes) of
@@ -72,6 +81,7 @@ nullTerminatedBytes =
 {-# INLINE bytesWhile #-}
 bytesWhile :: (Word8 -> Bool) -> Take ByteString
 bytesWhile predicate =
+  {-# SCC "bytesWhile" #-} 
   take (\availableAmount -> iterate availableAmount availableAmount)
   where
     iterate !availableAmount !unconsumedAmount !ptr =
@@ -88,6 +98,7 @@ bytesWhile predicate =
 {-# INLINE skipWhile #-}
 skipWhile :: (Word8 -> Bool) -> Take ()
 skipWhile predicate =
+  {-# SCC "skipWhile" #-} 
   take (\availableAmount -> iterate availableAmount availableAmount)
   where
     iterate !availableAmount !unconsumedAmount !ptr =
@@ -102,6 +113,7 @@ skipWhile predicate =
 {-# INLINE foldWhile #-}
 foldWhile :: (Word8 -> Bool) -> (state -> Word8 -> state) -> state -> Take state
 foldWhile predicate step start =
+  {-# SCC "foldWhile" #-} 
   take (iterate start)
   where
     iterate !state !unconsumedAmount !ptr =
@@ -118,6 +130,7 @@ foldWhile predicate step start =
 {-# INLINE unsignedASCIIIntegral #-}
 unsignedASCIIIntegral :: Integral a => Take a
 unsignedASCIIIntegral =
+  {-# SCC "unsignedASCIIIntegral" #-} 
   foldWhile byteIsDigit step 0
   where
     byteIsDigit byte =

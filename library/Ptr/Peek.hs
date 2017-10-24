@@ -29,31 +29,37 @@ instance Applicative Peek where
 {-# INLINE word8 #-}
 word8 :: Peek Word8
 word8 =
+  {-# SCC "word8" #-} 
   pokeAndPeek B.word8
 
 {-# INLINE beWord16 #-}
 beWord16 :: Peek Word16
 beWord16 =
+  {-# SCC "beWord16" #-} 
   pokeAndPeek B.beWord16
 
 {-# INLINE beWord32 #-}
 beWord32 :: Peek Word32
 beWord32 =
+  {-# SCC "beWord32" #-} 
   pokeAndPeek B.beWord32
 
 {-# INLINE beWord64 #-}
 beWord64 :: Peek Word64
 beWord64 =
+  {-# SCC "beWord64" #-} 
   pokeAndPeek B.beWord64
 
 {-# INLINE bytes #-}
 bytes :: Int -> Peek ByteString
 bytes amount =
+  {-# SCC "bytes" #-} 
   pokeAndPeek (B.bytes amount)
 
 {-# INLINE pokeAndPeek #-}
 pokeAndPeek :: B.PokeAndPeek input output -> Peek output
 pokeAndPeek (B.PokeAndPeek size _ io) =
+  {-# SCC "pokeAndPeek" #-} 
   Peek size io
 
 {-|
@@ -64,6 +70,7 @@ or Nothing, the specified length of data wasn't enough.
 {-# INLINE take #-}
 take :: Int -> C.Take a -> Peek (Maybe a)
 take amount (C.Take (StateT maybeT)) =
+  {-# SCC "take" #-} 
   Peek amount (\ptr -> case maybeT (amount, ptr) of MaybeT io -> fmap (fmap (\ (result, _) -> result)) io)
 
 {-|
@@ -74,5 +81,6 @@ Produces Peek, which itself produces another Peek, which is the same as the resu
 {-# INLINE peekAmountAndTake #-}
 peekAmountAndTake :: Peek Int -> C.Take a -> Peek (Peek (Maybe a))
 peekAmountAndTake peekAmount take_ =
+  {-# SCC "peekAmountAndTake" #-} 
   flip fmap peekAmount $ \amount ->
   take amount take_
