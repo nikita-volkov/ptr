@@ -1,7 +1,7 @@
 name:
   ptr
 version:
-  0.12.4
+  0.14
 category:
   Ptr, Data
 synopsis:
@@ -46,7 +46,6 @@ library
     Ptr.Receive
     Ptr.Poking
     Ptr.ByteString
-    Ptr.Buffer
   other-modules:
     Ptr.Receive.Core
     Ptr.IO
@@ -56,7 +55,6 @@ library
     -- data:
     text == 1.*,
     bytestring >= 0.10 && < 0.11,
-    buffer >= 0.4 && < 0.5,
     -- control:
     semigroups >= 0.18 && < 0.20,
     profunctors >= 5.1 && < 6,
