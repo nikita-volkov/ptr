@@ -16,7 +16,7 @@ newtype Take output =
 take :: (Int -> Ptr Word8 -> IO (Maybe (a, (Int, Ptr Word8)))) -> Take a
 take io =
   {-# SCC "take" #-} 
-  Take (StateT (\(availableAmount, ptr) -> MaybeT (io availableAmount ptr)))
+  Take (StateT (\(!availableAmount, !ptr) -> MaybeT (io availableAmount ptr)))
 
 {-# INLINE pokeAndPeek #-}
 pokeAndPeek :: A.PokeAndPeek input output -> Take output
