@@ -16,6 +16,7 @@ poking (A.Poking size population) =
 {-# INLINE take #-}
 take :: C.Take result -> B.ByteString -> Maybe result
 take (C.Take (StateT maybeT)) (B.PS fp offset length) =
+  {-# SCC "take" #-} 
   unsafePerformIO $
   withForeignPtr fp $ \ptr ->
   case maybeT (length, plusPtr ptr offset) of
@@ -28,6 +29,7 @@ take (C.Take (StateT maybeT)) (B.PS fp offset length) =
 {-# INLINE peek #-}
 peek :: D.Peek result -> B.ByteString -> Maybe result
 peek (D.Peek amount io) (B.PS fp offset length) =
+  {-# SCC "peek" #-} 
   if amount <= length
     then Just $ unsafePerformIO $ withForeignPtr fp $ \ptr ->
       io (plusPtr ptr offset)
