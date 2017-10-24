@@ -3,7 +3,7 @@ where
 
 import Ptr.Prelude hiding (take)
 import qualified Ptr.PokeAndPeek as B
-import qualified Ptr.Take as C
+import qualified Ptr.Parse as C
 
 
 data Peek output =
@@ -67,21 +67,21 @@ Given the length of the data and a specification of its sequential consumption,
 produces Peek, which results in Just the successfully taken value,
 or Nothing, the specified length of data wasn't enough.
 -}
-{-# INLINE take #-}
-take :: Int -> C.Take a -> (Int -> a) -> (Text -> a) -> Peek a
-take amount (C.Take takeIO) eoi error =
-  {-# SCC "take" #-} 
+{-# INLINE parse #-}
+parse :: Int -> C.Parse a -> (Int -> a) -> (Text -> a) -> Peek a
+parse amount (C.Parse parseIO) eoi error =
+  {-# SCC "parse" #-} 
   Peek amount $ \ptr ->
-  takeIO amount ptr (return . eoi) (return . error) (\result _ _ -> return result)
+  parseIO amount ptr (return . eoi) (return . error) (\result _ _ -> return result)
 
 {-|
 A standard idiom, where a header specifies the length of the body.
 
-Produces Peek, which itself produces another Peek, which is the same as the result of the 'take' function.
+Produces Peek, which itself produces another Peek, which is the same as the result of the 'parse' function.
 -}
-{-# INLINE peekAmountAndTake #-}
-peekAmountAndTake :: Peek Int -> C.Take a -> (Int -> a) -> (Text -> a) -> Peek (Peek a)
-peekAmountAndTake peekAmount take_ eoi error =
-  {-# SCC "peekAmountAndTake" #-} 
+{-# INLINE peekAmountAndParse #-}
+peekAmountAndParse :: Peek Int -> C.Parse a -> (Int -> a) -> (Text -> a) -> Peek (Peek a)
+peekAmountAndParse peekAmount parse_ eoi error =
+  {-# SCC "peekAmountAndParse" #-} 
   flip fmap peekAmount $ \amount ->
-  take amount take_ eoi error
+  parse amount parse_ eoi error

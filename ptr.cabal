@@ -40,7 +40,7 @@ library
     Haskell2010
   exposed-modules:
     Ptr.Peek
-    Ptr.Take
+    Ptr.Parse
     Ptr.Poke
     Ptr.PokeAndPeek
     Ptr.Receive

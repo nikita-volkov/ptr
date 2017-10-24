@@ -3,7 +3,7 @@ where
 
 import Ptr.Prelude
 import qualified Ptr.Poking as A
-import qualified Ptr.Take as C
+import qualified Ptr.Parse as C
 import qualified Ptr.Peek as D
 import qualified Data.ByteString.Internal as B
 
@@ -13,13 +13,13 @@ poking :: A.Poking -> B.ByteString
 poking (A.Poking size population) =
   B.unsafeCreate size population
 
-{-# INLINE take #-}
-take :: B.ByteString -> C.Take result -> (Int -> result) -> (Text -> result) -> result
-take (B.PS fp offset length) (C.Take takeIO) eoi error =
-  {-# SCC "take" #-} 
+{-# INLINE parse #-}
+parse :: B.ByteString -> C.Parse result -> (Int -> result) -> (Text -> result) -> result
+parse (B.PS fp offset length) (C.Parse parseIO) eoi error =
+  {-# SCC "parse" #-} 
   unsafePerformIO $
   withForeignPtr fp $ \ptr ->
-  takeIO length (plusPtr ptr offset) (return . eoi) (return . error) (\result _ _ -> return result)
+  parseIO length (plusPtr ptr offset) (return . eoi) (return . error) (\result _ _ -> return result)
 
 {-# INLINE peek #-}
 peek :: B.ByteString -> D.Peek result -> Maybe result
