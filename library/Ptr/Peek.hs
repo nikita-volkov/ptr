@@ -71,7 +71,13 @@ or Nothing, the specified length of data wasn't enough.
 take :: Int -> C.Take a -> Peek (Maybe a)
 take amount (C.Take (StateT maybeT)) =
   {-# SCC "take" #-} 
-  Peek amount (\ptr -> case maybeT (amount, ptr) of MaybeT io -> fmap (fmap (\ (result, _) -> result)) io)
+  Peek amount $ \ptr ->
+  case maybeT (amount, ptr) of
+    MaybeT io -> do
+      maybe <- io
+      case maybe of
+        Just (!result, _) -> return (Just result)
+        Nothing -> return Nothing
 
 {-|
 A standard idiom, where a header specifies the length of the body.
