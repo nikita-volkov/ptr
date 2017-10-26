@@ -62,6 +62,14 @@ pokeAndPeek (A.PokeAndPeek requiredAmount _ ptrIO) =
       succeed result (availableAmount - requiredAmount) (plusPtr ptr requiredAmount)
     else failWithEOI (requiredAmount - availableAmount)
 
+{-# INLINE limiting #-}
+limiting :: Int -> Parse output -> Parse output
+limiting limitAmount (Parse io) =
+  Parse $ \ !availableAmount !ptr failWithEOI failWithMessage succeed ->
+  if availableAmount >= limitAmount
+    then io limitAmount ptr failWithEOI failWithMessage succeed
+    else failWithEOI (limitAmount - availableAmount)
+
 {-# INLINE word8 #-}
 word8 :: Parse Word8
 word8 =
