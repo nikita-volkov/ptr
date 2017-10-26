@@ -70,6 +70,18 @@ limiting limitAmount (Parse io) =
     then io limitAmount ptr failWithEOI failWithMessage succeed
     else failWithEOI (limitAmount - availableAmount)
 
+{-|
+Decode the remaining bytes, whithout moving the parser's cursor.
+Useful for debugging.
+-}
+{-# INLINE peekRemainders #-}
+peekRemainders :: Parse ByteString
+peekRemainders =
+  {-# SCC "peekRemainders" #-} 
+  Parse $ \ !availableAmount !ptr failWithEOI failWithMessage succeed -> do
+    bytes <- D.peekBytes ptr availableAmount
+    succeed bytes availableAmount ptr
+
 {-# INLINE word8 #-}
 word8 :: Parse Word8
 word8 =
