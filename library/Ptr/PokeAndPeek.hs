@@ -54,24 +54,29 @@ instance Applicative (PokeAndPeek input) where
 {-# INLINE word8 #-}
 word8 :: InvPokeAndPeek Word8
 word8 =
+  {-# SCC "word8" #-} 
   PokeAndPeek 1 A.pokeWord8 A.peekWord8
 
 {-# INLINE beWord16 #-}
 beWord16 :: InvPokeAndPeek Word16
 beWord16 =
+  {-# SCC "beWord16" #-} 
   PokeAndPeek 2 A.pokeBEWord16 A.peekBEWord16
 
 {-# INLINE beWord32 #-}
 beWord32 :: InvPokeAndPeek Word32
 beWord32 =
+  {-# SCC "beWord32" #-} 
   PokeAndPeek 4 A.pokeBEWord32 A.peekBEWord32
 
 {-# INLINE beWord64 #-}
 beWord64 :: InvPokeAndPeek Word64
 beWord64 =
+  {-# SCC "beWord64" #-} 
   PokeAndPeek 8 A.pokeBEWord64 A.peekBEWord64
 
 {-# INLINE bytes #-}
 bytes :: Int -> InvPokeAndPeek ByteString
 bytes amount =
+  {-# SCC "bytes" #-} 
   PokeAndPeek amount (\ptr -> A.pokeBytesTrimming ptr amount) (\ptr -> A.peekBytes ptr amount)
