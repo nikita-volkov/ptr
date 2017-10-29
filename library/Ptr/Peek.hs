@@ -7,7 +7,7 @@ import qualified Ptr.Parse as C
 
 
 data Peek output =
-  Peek !Int !(Ptr Word8 -> IO output)
+  Peek {-# UNPACK #-} !Int !(Ptr Word8 -> IO output)
 
 instance Functor Peek where
   {-# INLINE fmap #-}
