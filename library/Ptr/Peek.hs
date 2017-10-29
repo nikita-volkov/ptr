@@ -4,6 +4,7 @@ where
 import Ptr.Prelude hiding (take)
 import qualified Ptr.PokeAndPeek as B
 import qualified Ptr.Parse as C
+import qualified Ptr.IO as A
 
 
 data Peek output =
@@ -26,35 +27,35 @@ instance Applicative Peek where
         leftIO ptr <*> rightIO (plusPtr ptr leftSize)
 
 
-{-# NOINLINE word8 #-}
+{-# INLINE word8 #-}
 word8 :: Peek Word8
 word8 =
   {-# SCC "word8" #-} 
-  pokeAndPeek B.word8
+  Peek 1 A.peekWord8
 
-{-# NOINLINE beWord16 #-}
+{-# INLINE beWord16 #-}
 beWord16 :: Peek Word16
 beWord16 =
   {-# SCC "beWord16" #-} 
-  pokeAndPeek B.beWord16
+  Peek 2 A.peekBEWord16
 
-{-# NOINLINE beWord32 #-}
+{-# INLINE beWord32 #-}
 beWord32 :: Peek Word32
 beWord32 =
   {-# SCC "beWord32" #-} 
-  pokeAndPeek B.beWord32
+  Peek 4 A.peekBEWord32
 
-{-# NOINLINE beWord64 #-}
+{-# INLINE beWord64 #-}
 beWord64 :: Peek Word64
 beWord64 =
   {-# SCC "beWord64" #-} 
-  pokeAndPeek B.beWord64
+  Peek 8 A.peekBEWord64
 
 {-# INLINE bytes #-}
 bytes :: Int -> Peek ByteString
-bytes amount =
+bytes !amount =
   {-# SCC "bytes" #-} 
-  pokeAndPeek (B.bytes amount)
+  Peek amount (\ ptr -> A.peekBytes ptr amount)
 
 {-# INLINE pokeAndPeek #-}
 pokeAndPeek :: B.PokeAndPeek input output -> Peek output
