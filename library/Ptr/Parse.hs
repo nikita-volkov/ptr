@@ -82,25 +82,25 @@ peekRemainders =
     bytes <- D.peekBytes ptr availableAmount
     succeed bytes availableAmount ptr
 
-{-# INLINE word8 #-}
+{-# NOINLINE word8 #-}
 word8 :: Parse Word8
 word8 =
   {-# SCC "word8" #-} 
   pokeAndPeek A.word8
 
-{-# INLINE beWord16 #-}
+{-# NOINLINE beWord16 #-}
 beWord16 :: Parse Word16
 beWord16 =
   {-# SCC "beWord16" #-} 
   pokeAndPeek A.beWord16
 
-{-# INLINE beWord32 #-}
+{-# NOINLINE beWord32 #-}
 beWord32 :: Parse Word32
 beWord32 =
   {-# SCC "beWord32" #-} 
   pokeAndPeek A.beWord32
 
-{-# INLINE beWord64 #-}
+{-# NOINLINE beWord64 #-}
 beWord64 :: Parse Word64
 beWord64 =
   {-# SCC "beWord64" #-} 

@@ -26,25 +26,25 @@ instance Applicative Peek where
         leftIO ptr <*> rightIO (plusPtr ptr leftSize)
 
 
-{-# INLINE word8 #-}
+{-# NOINLINE word8 #-}
 word8 :: Peek Word8
 word8 =
   {-# SCC "word8" #-} 
   pokeAndPeek B.word8
 
-{-# INLINE beWord16 #-}
+{-# NOINLINE beWord16 #-}
 beWord16 :: Peek Word16
 beWord16 =
   {-# SCC "beWord16" #-} 
   pokeAndPeek B.beWord16
 
-{-# INLINE beWord32 #-}
+{-# NOINLINE beWord32 #-}
 beWord32 :: Peek Word32
 beWord32 =
   {-# SCC "beWord32" #-} 
   pokeAndPeek B.beWord32
 
-{-# INLINE beWord64 #-}
+{-# NOINLINE beWord64 #-}
 beWord64 :: Peek Word64
 beWord64 =
   {-# SCC "beWord64" #-} 
