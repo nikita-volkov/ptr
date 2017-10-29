@@ -52,6 +52,16 @@ fail :: Text -> Parse output
 fail message =
   Parse $ \ _ _ _ failWithMessage _ -> failWithMessage message
 
+{-# INLINE io #-}
+io :: Int -> (Ptr Word8 -> IO output) -> Parse output
+io !requiredAmount ptrIO =
+  Parse $ \ !availableAmount !ptr failWithEOI failWithMessage succeed ->
+  if availableAmount >= requiredAmount
+    then do
+      !result <- ptrIO ptr
+      succeed result (availableAmount - requiredAmount) (plusPtr ptr requiredAmount)
+    else failWithEOI (requiredAmount - availableAmount)
+
 {-# INLINE pokeAndPeek #-}
 pokeAndPeek :: A.PokeAndPeek input output -> Parse output
 pokeAndPeek (A.PokeAndPeek requiredAmount _ ptrIO) =
@@ -110,7 +120,7 @@ beWord64 =
 bytes :: Int -> Parse ByteString
 bytes amount =
   {-# SCC "bytes" #-} 
-  pokeAndPeek (A.bytes amount)
+  io amount (\ ptr -> D.peekBytes ptr amount)
 
 {-# INLINE allBytes #-}
 allBytes :: Parse ByteString
