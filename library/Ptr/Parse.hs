@@ -96,25 +96,25 @@ peekRemainders =
 word8 :: Parse Word8
 word8 =
   {-# SCC "word8" #-} 
-  pokeAndPeek A.word8
+  io 1 D.peekWord8
 
 {-# NOINLINE beWord16 #-}
 beWord16 :: Parse Word16
 beWord16 =
   {-# SCC "beWord16" #-} 
-  pokeAndPeek A.beWord16
+  io 2 D.peekBEWord16
 
 {-# NOINLINE beWord32 #-}
 beWord32 :: Parse Word32
 beWord32 =
   {-# SCC "beWord32" #-} 
-  pokeAndPeek A.beWord32
+  io 4 D.peekBEWord32
 
 {-# NOINLINE beWord64 #-}
 beWord64 :: Parse Word64
 beWord64 =
   {-# SCC "beWord64" #-} 
-  pokeAndPeek A.beWord64
+  io 8 D.peekBEWord64
 
 {-# INLINE bytes #-}
 bytes :: Int -> Parse ByteString
