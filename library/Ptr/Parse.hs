@@ -19,9 +19,9 @@ instance Applicative Parse where
     Parse (\ availableAmount ptr _ _ succeed -> succeed x availableAmount ptr)
   {-# INLINE (<*>) #-}
   (<*>) (Parse left) (Parse right) =
-    Parse $ \ availableAmount ptr failWithEOI failWithMessage succeed ->
-    left availableAmount ptr failWithEOI failWithMessage $ \ leftOutput leftAvailableAmount leftPtr ->
-    right leftAvailableAmount leftPtr failWithEOI failWithMessage $ \ rightOutput rightAvailableAmount rightPtr ->
+    Parse $ \ !availableAmount !ptr failWithEOI failWithMessage succeed ->
+    left availableAmount ptr failWithEOI failWithMessage $ \ leftOutput !leftAvailableAmount !leftPtr ->
+    right leftAvailableAmount leftPtr failWithEOI failWithMessage $ \ rightOutput !rightAvailableAmount !rightPtr ->
     succeed (leftOutput rightOutput) rightAvailableAmount rightPtr
 
 instance Alternative Parse where
@@ -38,8 +38,8 @@ instance Monad Parse where
   return = pure
   {-# INLINE (>>=) #-}
   (>>=) (Parse left) rightK =
-    Parse $ \ availableAmount ptr failWithEOI failWithMessage succeed ->
-    left availableAmount ptr failWithEOI failWithMessage $ \ leftOutput leftAvailableAmount leftPtr ->
+    Parse $ \ !availableAmount !ptr failWithEOI failWithMessage succeed ->
+    left availableAmount ptr failWithEOI failWithMessage $ \ leftOutput !leftAvailableAmount !leftPtr ->
     case rightK leftOutput of
       Parse right ->
         right leftAvailableAmount leftPtr failWithEOI failWithMessage succeed
