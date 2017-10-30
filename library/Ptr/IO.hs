@@ -4,6 +4,7 @@ where
 
 import Ptr.Prelude
 import qualified Data.ByteString.Internal as A
+import qualified Data.ByteString.Short.Internal as B
 import qualified Ptr.UncheckedShifting as D
 
 
@@ -105,6 +106,18 @@ peekBytes :: Ptr Word8 -> Int -> IO ByteString
 peekBytes ptr amount =
   {-# SCC "peekBytes" #-} 
   A.create amount $ \destPtr -> A.memcpy destPtr ptr amount
+
+{-# INLINE peekShortByteString #-}
+peekShortByteString :: Ptr Word8 -> Int -> IO ShortByteString
+peekShortByteString ptr amount =
+  B.createFromPtr ptr amount
+
+{-# INLINE peekNullTerminatedShortByteString #-}
+peekNullTerminatedShortByteString :: Ptr Word8 -> (Int -> IO ShortByteString -> IO a) -> IO a
+peekNullTerminatedShortByteString ptr cont =
+  do
+    !length <- fromIntegral <$> A.c_strlen (castPtr ptr)
+    cont length (B.createFromPtr ptr length)
 
 {-# INLINE pokeStorable #-}
 pokeStorable :: Storable a => Ptr Word8 -> a -> IO ()

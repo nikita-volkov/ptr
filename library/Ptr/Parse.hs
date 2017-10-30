@@ -4,6 +4,7 @@ where
 import Ptr.Prelude hiding (peek, take)
 import qualified Ptr.PokeAndPeek as A
 import qualified Data.ByteString.Char8 as B
+import qualified Data.ByteString.Short.Internal as E
 import qualified Ptr.Prelude as C
 import qualified Ptr.IO as D
 
@@ -140,6 +141,18 @@ nullTerminatedBytes =
       consumedAmount -> if consumedAmount <= availableAmount
         then succeed bytes (availableAmount - consumedAmount) (plusPtr ptr consumedAmount)
         else failWithEOI (consumedAmount - availableAmount)
+
+{-# INLINE nullTerminatedShortByteString #-}
+nullTerminatedShortByteString :: Parse ShortByteString
+nullTerminatedShortByteString =
+  {-# SCC "nullTerminatedShortByteString" #-}
+  Parse $ \ !availableAmount !ptr failWithEOI failWithMessage succeed ->
+  D.peekNullTerminatedShortByteString ptr $ \ length create ->
+  if length <= availableAmount
+    then do
+      result <- create
+      succeed result (availableAmount - length) (plusPtr ptr length)
+    else failWithEOI (length - availableAmount)
 
 {-# INLINE bytesWhile #-}
 bytesWhile :: (Word8 -> Bool) -> Parse ByteString

@@ -49,6 +49,7 @@ import Data.Semigroup as Exports
 -- bytestring
 -------------------------
 import Data.ByteString as Exports (ByteString)
+import Data.ByteString.Short as Exports (ShortByteString)
 
 -- text
 -------------------------
