@@ -56,6 +56,7 @@ fail message =
 {-# INLINE io #-}
 io :: Int -> (Ptr Word8 -> IO output) -> Parse output
 io !requiredAmount ptrIO =
+  {-# SCC "io" #-} 
   Parse $ \ !availableAmount !ptr failWithEOI failWithMessage succeed ->
   if availableAmount >= requiredAmount
     then do
