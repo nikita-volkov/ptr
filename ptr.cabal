@@ -41,6 +41,7 @@ library
   exposed-modules:
     Ptr.Peek
     Ptr.Parse
+    Ptr.ParseUnbound
     Ptr.Poke
     Ptr.PokeAndPeek
     Ptr.Receive

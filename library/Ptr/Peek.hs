@@ -4,6 +4,7 @@ where
 import Ptr.Prelude hiding (take)
 import qualified Ptr.PokeAndPeek as B
 import qualified Ptr.Parse as C
+import qualified Ptr.ParseUnbound as D
 import qualified Ptr.IO as A
 
 
@@ -74,6 +75,21 @@ parse amount (C.Parse parseIO) eoi error =
   {-# SCC "parse" #-} 
   Peek amount $ \ptr ->
   parseIO amount ptr (return . eoi) (return . error) (\result _ _ -> return result)
+
+{-|
+Given the length of the data and a specification of its sequential consumption,
+produces Peek, which results in Just the successfully taken value,
+or Nothing, if the specified length of data wasn't enough.
+-}
+{-# INLINE parseUnbound #-}
+parseUnbound :: Int -> D.ParseUnbound a -> (Int -> a) -> (Text -> a) -> Peek a
+parseUnbound sizeBound (D.ParseUnbound parseIO) eoi error =
+  {-# SCC "parse" #-} 
+  Peek sizeBound $ \ ptr ->
+  parseIO ptr (return . error)
+    (\ result size -> if size <= sizeBound
+      then return (eoi (size - sizeBound))
+      else return result)
 
 {-|
 A standard idiom, where a header specifies the length of the body.
