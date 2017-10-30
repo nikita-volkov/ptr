@@ -66,7 +66,7 @@ pokeAndPeek (B.PokeAndPeek size _ io) =
 {-|
 Given the length of the data and a specification of its sequential consumption,
 produces Peek, which results in Just the successfully taken value,
-or Nothing, the specified length of data wasn't enough.
+or Nothing, if the specified length of data wasn't enough.
 -}
 {-# INLINE parse #-}
 parse :: Int -> C.Parse a -> (Int -> a) -> (Text -> a) -> Peek a
