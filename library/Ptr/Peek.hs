@@ -73,7 +73,7 @@ or Nothing, if the specified length of data wasn't enough.
 parse :: Int -> C.Parse a -> (Int -> a) -> (Text -> a) -> Peek a
 parse amount (C.Parse parseIO) eoi error =
   {-# SCC "parse" #-} 
-  Peek amount $ \ptr ->
+  Peek amount $ \ ptr ->
   parseIO amount ptr (return . eoi) (return . error) (\result _ _ -> return result)
 
 {-|
