@@ -53,18 +53,7 @@ fail :: Text -> Parse output
 fail message =
   Parse $ \ _ _ _ failWithMessage _ -> failWithMessage message
 
-{-# RULES
-  "io <*> io"
-    forall leftSize leftPtrIO rightSize rightPtrIO.
-      io leftSize leftPtrIO <*> io rightSize rightPtrIO =
-        io
-          (leftSize + rightSize)
-          (\ ptr -> do
-            leftResult <- leftPtrIO ptr
-            rightResult <- rightPtrIO (plusPtr ptr leftSize)
-            return (leftResult rightResult))
-  #-}
-{-# INLINE[1] io #-}
+{-# INLINE io #-}
 io :: Int -> (Ptr Word8 -> IO output) -> Parse output
 io !requiredAmount ptrIO =
   {-# SCC "io" #-} 
