@@ -29,7 +29,7 @@ instance Alternative Parse where
     Parse (\ _ _ failWithEOI _ _ -> failWithEOI 0)
   {-# INLINE (<|>) #-}
   (<|>) (Parse left) (Parse right) =
-    Parse $ \ availableAmount ptr failWithEOI failWithMessage succeed ->
+    Parse $ \ !availableAmount !ptr failWithEOI failWithMessage succeed ->
     left availableAmount ptr 
       (\ _ -> right availableAmount ptr failWithEOI failWithMessage succeed)
       failWithMessage succeed
@@ -102,7 +102,7 @@ peekRemainders :: Parse ByteString
 peekRemainders =
   {-# SCC "peekRemainders" #-} 
   Parse $ \ !availableAmount !ptr failWithEOI failWithMessage succeed -> do
-    bytes <- D.peekBytes ptr availableAmount
+    !bytes <- D.peekBytes ptr availableAmount
     succeed bytes availableAmount ptr
 
 {-# INLINE word8 #-}
@@ -140,7 +140,7 @@ allBytes :: Parse ByteString
 allBytes =
   {-# SCC "allBytes" #-} 
   Parse $ \ !availableAmount !ptr failWithEOI failWithMessage succeed -> do
-    bytes <- D.peekBytes ptr availableAmount
+    !bytes <- D.peekBytes ptr availableAmount
     succeed bytes 0 (plusPtr ptr availableAmount)
 
 {-# INLINE nullTerminatedBytes #-}
@@ -148,7 +148,7 @@ nullTerminatedBytes :: Parse ByteString
 nullTerminatedBytes =
   {-# SCC "nullTerminatedBytes" #-}
   Parse $ \ !availableAmount !ptr failWithEOI failWithMessage succeed -> do
-    bytes <- B.packCString (castPtr ptr)
+    !bytes <- B.packCString (castPtr ptr)
     case succ (B.length bytes) of
       consumedAmount -> if consumedAmount <= availableAmount
         then succeed bytes (availableAmount - consumedAmount) (plusPtr ptr consumedAmount)
@@ -162,7 +162,7 @@ nullTerminatedShortByteString =
   D.peekNullTerminatedShortByteString ptr $ \ length create ->
   if length <= availableAmount
     then do
-      result <- create
+      !result <- create
       succeed result (availableAmount - length) (plusPtr ptr length)
     else failWithEOI (length - availableAmount)
 
