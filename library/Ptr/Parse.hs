@@ -48,6 +48,11 @@ instance MonadPlus Parse where
   mzero = empty
   mplus = (<|>)
 
+instance MonadIO Parse where
+  {-# INLINE liftIO #-}
+  liftIO io =
+    Parse $ \ availableAmount ptr _ _ succeed -> io >>= \ output -> succeed output availableAmount ptr
+
 {-# INLINE fail #-}
 fail :: Text -> Parse output
 fail message =
