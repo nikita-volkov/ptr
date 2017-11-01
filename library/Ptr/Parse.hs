@@ -64,6 +64,13 @@ io !requiredAmount ptrIO =
       succeed result (availableAmount - requiredAmount) (plusPtr ptr requiredAmount)
     else failWithEOI (requiredAmount - availableAmount)
 
+{-# INLINE mapInIO #-}
+mapInIO :: (output -> IO newOutput) -> Parse output -> Parse newOutput
+mapInIO io (Parse parseIO) =
+  Parse $ \ !availableAmount !ptr failWithEOI failWithMessage succeed ->
+  parseIO availableAmount ptr failWithEOI failWithMessage
+    (\ output newAvailableAmount newPtr -> io output >>= \ newOutput -> succeed newOutput newAvailableAmount newPtr)
+
 {-# INLINE pokeAndPeek #-}
 pokeAndPeek :: A.PokeAndPeek input output -> Parse output
 pokeAndPeek (A.PokeAndPeek requiredAmount _ ptrIO) =
