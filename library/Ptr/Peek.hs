@@ -58,6 +58,12 @@ bytes !amount =
   {-# SCC "bytes" #-} 
   Peek amount (\ ptr -> A.peekBytes ptr amount)
 
+{-# INLINE shortByteString #-}
+shortByteString :: Int -> Peek ShortByteString
+shortByteString !amount =
+  {-# SCC "shortByteString" #-} 
+  Peek amount (\ ptr -> A.peekShortByteString ptr amount)
+
 {-# INLINE pokeAndPeek #-}
 pokeAndPeek :: B.PokeAndPeek input output -> Peek output
 pokeAndPeek (B.PokeAndPeek size _ io) =
