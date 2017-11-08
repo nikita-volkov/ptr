@@ -10,6 +10,8 @@ import Test.QuickCheck.Instances
 import qualified Ptr.Poke as B
 import qualified Ptr.Peek as C
 import qualified Ptr.PokeAndPeek as E
+import qualified Ptr.ByteString as A
+import qualified Ptr.Poking as F
 import qualified Data.ByteString as D
 
 
@@ -26,6 +28,11 @@ main =
     testProperty "Poke and peek (beWord64)" $ \input -> input === fromJust (pokeThenPeek B.beWord64 C.beWord64) input
     ,
     testProperty "PokeAndPeek composition" $ \input -> input === pokeAndPeek ((,) <$> lmap fst E.word8 <*> lmap snd E.beWord32) input
+    ,
+    testCase "paddedAndTrimmedAsciiIntegral" $ do
+      assertEqual "" "001" (A.poking (F.paddedAndTrimmedAsciiIntegral 3 1))
+      assertEqual "" "001" (A.poking (F.paddedAndTrimmedAsciiIntegral 3 2001))
+      assertEqual "" "000" (A.poking (F.paddedAndTrimmedAsciiIntegral 3 (-1)))
   ]
 
 pokeThenPeek :: B.Poke a -> C.Peek a -> Maybe (a -> a)

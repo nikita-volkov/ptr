@@ -100,6 +100,19 @@ asciiIntegral =
             (quot, rem) ->
               loop (word8 (48 + fromIntegral rem) <> builder) quot
 
+{-# INLINABLE paddedAndTrimmedAsciiIntegral #-}
+paddedAndTrimmedAsciiIntegral :: Integral a => Int -> a -> Poking
+paddedAndTrimmedAsciiIntegral !length !integral =
+  if length > 0
+    then
+      if integral >= 0
+        then case quotRem integral 10 of
+          (quot, rem) ->
+            paddedAndTrimmedAsciiIntegral (pred length) quot <>
+            word8 (48 + fromIntegral rem)
+        else stimes length (word8 48)
+    else mempty
+
 {-# INLINE asciiChar #-}
 asciiChar :: Char -> Poking
 asciiChar =
