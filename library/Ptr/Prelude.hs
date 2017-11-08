@@ -55,6 +55,10 @@ import Data.ByteString.Short as Exports (ShortByteString)
 -------------------------
 import Data.Text as Exports (Text)
 
+-- time
+-------------------------
+import Data.Time as Exports
+
 -- bug
 -------------------------
 import Bug as Exports

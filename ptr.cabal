@@ -56,6 +56,7 @@ library
     -- data:
     text == 1.*,
     bytestring >= 0.10 && < 0.11,
+    time >= 1 && < 2,
     -- control:
     semigroups >= 0.18 && < 0.20,
     profunctors >= 5.1 && < 6,

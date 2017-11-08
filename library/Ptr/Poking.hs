@@ -117,3 +117,22 @@ paddedAndTrimmedAsciiIntegral !length !integral =
 asciiChar :: Char -> Poking
 asciiChar =
   word8 . fromIntegral . ord
+
+{-# INLINABLE utcTimeInIso8601InAscii #-}
+{-
+2017-02-01T05:03:58Z
+-}
+utcTimeInIso8601InAscii :: UTCTime -> Poking
+utcTimeInIso8601InAscii utcTime =
+  paddedAndTrimmedAsciiIntegral 4 year <> word8 45 <> 
+  paddedAndTrimmedAsciiIntegral 2 month <> word8 45 <>
+  paddedAndTrimmedAsciiIntegral 2 day <>
+  word8 84 <>
+  paddedAndTrimmedAsciiIntegral 2 hour <> word8 58 <>
+  paddedAndTrimmedAsciiIntegral 2 minute <> word8 58 <>
+  paddedAndTrimmedAsciiIntegral 2 (round second) <>
+  word8 90
+  where
+    LocalTime date (TimeOfDay hour minute second) = utcToLocalTime utc utcTime
+    (year, month, day) = toGregorian date
+
