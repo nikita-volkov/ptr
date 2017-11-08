@@ -9,7 +9,10 @@ import qualified Data.ByteString.Internal as B
 
 
 {-|
-Efficiently composable specification of how to populate a pointer.
+An efficiently composable unmaterialised specification of how to populate a pointer.
+
+Once composed it can be materialized into a specific data-structure like ByteString or
+to directly populate a pointer in some low-level API.
 -}
 data Poking =
   {-|
