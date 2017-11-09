@@ -50,6 +50,7 @@ library
   other-modules:
     Ptr.Receive.Core
     Ptr.IO
+    Ptr.PokeIO
     Ptr.UncheckedShifting
     Ptr.Prelude
   build-depends:

@@ -5,6 +5,7 @@ import Ptr.Prelude
 import qualified Ptr.IO as A
 import qualified Ptr.Poke as C
 import qualified Ptr.PokeAndPeek as D
+import qualified Ptr.PokeIO as E
 import qualified Data.ByteString.Internal as B
 
 
@@ -22,9 +23,18 @@ data Poking =
   Poking !Int !(Ptr Word8 -> IO ())
 
 instance Semigroup Poking where
-  {-# INLINE (<>) #-}
+  {-|
+  When the pokings are both larger than 2048 bits,
+  the serialization is performed concurrently.
+  -}
+  {-# INLINABLE (<>) #-}
   (<>) (Poking space1 action1) (Poking space2 action2) =
-    Poking (space1 + space2) (\ptr -> action1 ptr *> action2 (plusPtr ptr space1))
+    Poking (space1 + space2) action
+    where
+      action =
+        if space1 < 2048 || space2 < 2048
+          then E.sequentially space1 action1 action2
+          else E.concurrently space1 action1 action2
 
 instance Monoid Poking where
   {-# INLINE mempty #-}
@@ -33,25 +43,6 @@ instance Monoid Poking where
   {-# INLINE mappend #-}
   mappend =
     (<>)
-
-{-|
-Same as 'mappend' and '<>',
-but performs the serialization concurrently.
-This comes at the cost of an overhead,
-so it is only advised to use this function when the merged serializations are heavy.
--}
-prependConc :: Poking -> Poking -> Poking
-prependConc (Poking space1 action1) (Poking space2 action2) =
-  Poking (space1 + space2) action
-  where
-    action ptr =
-      do
-        lock <- newEmptyMVar
-        forkIO $ do
-          action1 ptr
-          putMVar lock ()
-        action2 (plusPtr ptr space1)
-        takeMVar lock
 
 {-# INLINE word8 #-}
 word8 :: Word8 -> Poking
