@@ -54,3 +54,13 @@ bytes amount =
 pokeAndPeek :: B.PokeAndPeek input output -> Poke input
 pokeAndPeek (B.PokeAndPeek size io _) =
   Poke size io
+
+{-# INLINE asciiChar #-}
+asciiChar :: Poke Char
+asciiChar =
+  contramap (fromIntegral . ord) word8
+
+{-# INLINE asciiDigit #-}
+asciiDigit :: Poke Word8
+asciiDigit =
+  contramap (+ 48) word8
