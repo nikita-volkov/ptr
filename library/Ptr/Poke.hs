@@ -64,3 +64,8 @@ asciiChar =
 asciiDigit :: Poke Word8
 asciiDigit =
   contramap (+ 48) word8
+
+{-# INLINE asciiHexDigit #-}
+asciiHexDigit :: Poke Word8
+asciiHexDigit =
+  contramap (\ n -> if n < 10 then 48 + n else 55 + n) word8
