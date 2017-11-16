@@ -31,13 +31,13 @@ main =
     ,
     testGroup "Poking"
     [
-      testCase "paddedAndTrimmedAsciiIntegral" $ do
-        assertEqual "" "001" (A.poking (F.paddedAndTrimmedAsciiIntegral 3 1))
-        assertEqual "" "001" (A.poking (F.paddedAndTrimmedAsciiIntegral 3 2001))
-        assertEqual "" "000" (A.poking (F.paddedAndTrimmedAsciiIntegral 3 (-1)))
+      testCase "asciiPaddedAndTrimmedIntegral" $ do
+        assertEqual "" "001" (A.poking (F.asciiPaddedAndTrimmedIntegral 3 1))
+        assertEqual "" "001" (A.poking (F.asciiPaddedAndTrimmedIntegral 3 2001))
+        assertEqual "" "000" (A.poking (F.asciiPaddedAndTrimmedIntegral 3 (-1)))
       ,
-      testCase "utcTimeInIso8601InAscii" $ do
-        assertEqual "" "2017-02-01T05:03:58Z" (A.poking (F.utcTimeInIso8601InAscii (read "2017-02-01 05:03:58")))
+      testCase "asciiUtcTimeInIso8601" $ do
+        assertEqual "" "2017-02-01T05:03:58Z" (A.poking (F.asciiUtcTimeInIso8601 (read "2017-02-01 05:03:58")))
     ]
   ]
 
