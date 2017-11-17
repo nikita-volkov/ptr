@@ -1,7 +1,7 @@
 module Ptr.Poking
 where
 
-import Ptr.Prelude
+import Ptr.Prelude hiding (length)
 import qualified Ptr.IO as A
 import qualified Ptr.Poke as C
 import qualified Ptr.PokeAndPeek as D
@@ -43,6 +43,16 @@ instance Monoid Poking where
   {-# INLINE mappend #-}
   mappend =
     (<>)
+
+{-# INLINE null #-}
+null :: Poking -> Bool
+null =
+  (== 0) . length
+
+{-# INLINE length #-}
+length :: Poking -> Int
+length (Poking size _) =
+  size
 
 {-# INLINE word8 #-}
 word8 :: Word8 -> Poking
