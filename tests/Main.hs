@@ -12,6 +12,7 @@ import qualified Ptr.Peek as C
 import qualified Ptr.PokeAndPeek as E
 import qualified Ptr.ByteString as A
 import qualified Ptr.Poking as F
+import qualified Ptr.Parse as G
 import qualified Data.ByteString as D
 
 
@@ -39,6 +40,16 @@ main =
       testCase "asciiUtcTimeInIso8601" $ do
         assertEqual "" "2017-02-01T05:03:58Z" (A.poking (F.asciiUtcTimeInIso8601 (read "2017-02-01 05:03:58")))
     ]
+    ,
+    parsing
+  ]
+
+parsing :: TestTree
+parsing =
+  testGroup "Parsing" $
+  [
+    testCase "" $
+    assertEqual "" "123" (A.parse "123456" (G.bytesWhile (< 52)) undefined undefined)
   ]
 
 pokeThenPeek :: B.Poke a -> C.Peek a -> Maybe (a -> a)

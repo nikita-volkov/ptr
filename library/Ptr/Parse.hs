@@ -173,15 +173,15 @@ bytesWhile predicate =
   {-# SCC "bytesWhile" #-}
   Parse $ \ !availableAmount !ptr failWithEOI failWithMessage succeed ->
   let
-    iterate !availableAmount !unconsumedAmount !ptr =
+    iterate !availableAmount !unconsumedAmount !currentPtr =
       if unconsumedAmount > 0
         then do
-          byte <- C.peek ptr
+          byte <- C.peek currentPtr
           if predicate byte
-            then iterate availableAmount (pred unconsumedAmount) (plusPtr ptr 1)
+            then iterate availableAmount (pred unconsumedAmount) (plusPtr currentPtr 1)
             else do
               bytes <- B.packCStringLen (castPtr ptr, availableAmount - unconsumedAmount)
-              succeed bytes unconsumedAmount ptr
+              succeed bytes unconsumedAmount currentPtr
         else failWithEOI 0
     in iterate availableAmount availableAmount ptr
 
