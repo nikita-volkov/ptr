@@ -140,3 +140,12 @@ asciiUtcTimeInIso8601 utcTime =
     LocalTime date (TimeOfDay hour minute second) = utcToLocalTime utc utcTime
     (year, month, day) = toGregorian date
 
+{-# INLINE list #-}
+list :: (element -> Poking) -> [element] -> Poking
+list element =
+  loop mempty
+  where
+    loop state =
+      \ case
+        head : tail -> loop (state <> word8 1 <> element head) tail
+        _ -> state <> word8 0
