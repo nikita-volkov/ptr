@@ -48,8 +48,9 @@ parsing :: TestTree
 parsing =
   testGroup "Parsing" $
   [
-    testCase "" $
-    assertEqual "" "123" (A.parse "123456" (G.bytesWhile (< 52)) undefined undefined)
+    testCase "bytesWhile" $ assertEqual "" "123" (A.parse "123456" (G.bytesWhile (< 52)) undefined undefined)
+    ,
+    testCase "bytesWhile 2" $ assertEqual "" "123456" (A.parse "123456" (G.bytesWhile (< 59)) undefined undefined)
   ]
 
 pokeThenPeek :: B.Poke a -> C.Peek a -> Maybe (a -> a)
