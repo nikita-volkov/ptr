@@ -59,6 +59,16 @@ word8 :: Word8 -> Poking
 word8 x =
   Poking 1 (flip A.pokeWord8 x)
 
+{-# INLINE leWord32 #-}
+leWord32 :: Word32 -> Poking
+leWord32 x =
+  Poking 4 (flip A.pokeLEWord32 x)
+
+{-# INLINE leWord64 #-}
+leWord64 :: Word64 -> Poking
+leWord64 x =
+  Poking 8 (flip A.pokeLEWord64 x)
+
 {-# INLINE beWord32 #-}
 beWord32 :: Word32 -> Poking
 beWord32 x =
