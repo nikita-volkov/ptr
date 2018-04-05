@@ -57,6 +57,24 @@ word8 =
   {-# SCC "word8" #-} 
   PokeAndPeek 1 A.pokeWord8 A.peekWord8
 
+{-# INLINE leWord16 #-}
+leWord16 :: InvPokeAndPeek Word16
+leWord16 =
+  {-# SCC "leWord16" #-} 
+  PokeAndPeek 2 A.pokeLEWord16 A.peekLEWord16
+
+{-# INLINE leWord32 #-}
+leWord32 :: InvPokeAndPeek Word32
+leWord32 =
+  {-# SCC "leWord32" #-} 
+  PokeAndPeek 4 A.pokeLEWord32 A.peekLEWord32
+
+{-# INLINE leWord64 #-}
+leWord64 :: InvPokeAndPeek Word64
+leWord64 =
+  {-# SCC "leWord64" #-} 
+  PokeAndPeek 8 A.pokeLEWord64 A.peekLEWord64
+
 {-# INLINE beWord16 #-}
 beWord16 :: InvPokeAndPeek Word16
 beWord16 =

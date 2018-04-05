@@ -30,6 +30,21 @@ word8 :: Poke Word8
 word8 =
   pokeAndPeek B.word8
 
+{-# INLINE leWord16 #-}
+leWord16 :: Poke Word16
+leWord16 =
+  pokeAndPeek B.leWord16
+
+{-# INLINE leWord32 #-}
+leWord32 :: Poke Word32
+leWord32 =
+  pokeAndPeek B.leWord32
+
+{-# INLINE leWord64 #-}
+leWord64 :: Poke Word64
+leWord64 =
+  pokeAndPeek B.leWord64
+
 {-# INLINE beWord16 #-}
 beWord16 :: Poke Word16
 beWord16 =
