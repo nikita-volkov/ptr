@@ -3,6 +3,7 @@ where
 
 import Ptr.Prelude
 import qualified Ptr.PokeAndPeek as B
+import qualified Data.Vector as F
 
 
 {-|
@@ -84,3 +85,16 @@ asciiDigit =
 asciiHexDigit :: Poke Word8
 asciiHexDigit =
   contramap (\ n -> if n < 10 then 48 + n else 55 + n) word8
+
+{-# INLINE vector #-}
+vector :: Int -> Poke element -> Poke (F.Vector element)
+vector vectorSize (Poke elementByteSize elementIO) =
+  Poke vectorByteSize vectorIO
+  where
+    vectorByteSize =
+      vectorSize * elementByteSize
+    vectorIO =
+      F.foldM'_ step
+      where
+        step ptr element =
+          elementIO ptr element $> plusPtr ptr elementByteSize
