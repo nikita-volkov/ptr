@@ -7,6 +7,7 @@ import qualified Ptr.Poke as C
 import qualified Ptr.PokeAndPeek as D
 import qualified Ptr.PokeIO as E
 import qualified Data.ByteString.Internal as B
+import qualified Data.Vector as F
 
 
 {-|
@@ -20,7 +21,7 @@ data Poking =
   * Amount of bytes the encoded data will occupy.
   * Exception-free action, which populates the pointer to the encoded data.
   -}
-  Poking !Int !(Ptr Word8 -> IO ())
+  Poking !Int (Ptr Word8 -> IO ())
 
 instance Semigroup Poking where
   {-|
@@ -169,3 +170,23 @@ list element =
       \ case
         head : tail -> loop (state <> word8 1 <> element head) tail
         _ -> state <> word8 0
+
+{-# INLINABLE vector #-}
+vector :: (element -> Poking) -> F.Vector element -> Poking
+vector element vectorValue =
+  Poking byteSize io
+  where
+    byteSize =
+      foldl' step 0 vectorValue
+      where
+        step !byteSize elementValue =
+          case element elementValue of
+            Poking elementByteSize _ -> byteSize + elementByteSize
+    io ptr =
+      F.foldM'_ step ptr vectorValue
+      where
+        step ptr elementValue =
+          case element elementValue of
+            Poking elementByteSize elementIO -> do
+              elementIO ptr
+              return (plusPtr ptr elementByteSize)
