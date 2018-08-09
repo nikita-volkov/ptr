@@ -182,7 +182,9 @@ bytesWhile predicate =
             else do
               bytes <- B.packCStringLen (castPtr ptr, availableAmount - unconsumedAmount)
               succeed bytes unconsumedAmount currentPtr
-        else failWithEOI 0
+        else do
+          bytes <- B.packCStringLen (castPtr ptr, availableAmount - unconsumedAmount)
+          succeed bytes unconsumedAmount currentPtr
     in iterate availableAmount availableAmount ptr
 
 {-# INLINE skipWhile #-}
@@ -198,7 +200,7 @@ skipWhile predicate =
           if predicate byte
             then iterate availableAmount (pred unconsumedAmount) (plusPtr ptr 1)
             else succeed () unconsumedAmount ptr
-        else failWithEOI 0
+        else succeed () unconsumedAmount ptr
     in iterate availableAmount availableAmount ptr
 
 {-# INLINE foldWhile #-}

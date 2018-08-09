@@ -53,12 +53,16 @@ main =
 
 parsing :: TestTree
 parsing =
-  testGroup "Parsing" $
-  [
-    testCase "bytesWhile" $ assertEqual "" "123" (A.parse "123456" (G.bytesWhile (< 52)) undefined undefined)
-    ,
-    testCase "bytesWhile 2" $ assertEqual "" (Right "123456") (A.parse "123456" (fmap Right (G.bytesWhile (< 59))) (Left . Left) (Left . Right))
-  ]
+  testGroup "Parsing" $ let
+    assertParsesTo expected input parser =
+      assertEqual "" (Right expected) (A.parse input (fmap Right parser) (Left . Left) (Left . Right))
+    in [
+        testCase "bytesWhile" $ assertParsesTo "123" "123456" $ G.bytesWhile (< 52)
+        ,
+        testCase "bytesWhile on full input" $ assertParsesTo "123456" "123456" $ G.bytesWhile (< 59)
+        ,
+        testCase "skipWhile on full input" $ assertParsesTo () "123456" $ G.skipWhile (< 59)
+      ]
 
 pokeThenPeek :: B.Poke a -> C.Peek a -> Maybe (a -> a)
 pokeThenPeek (B.Poke pokeSize pokeIO) (C.Peek peekSize peekIO) =
