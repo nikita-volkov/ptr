@@ -8,6 +8,7 @@ import qualified Ptr.PokeAndPeek as D
 import qualified Ptr.PokeIO as E
 import qualified Data.ByteString.Internal as B
 import qualified Data.Vector as F
+import qualified Data.List as List
 
 
 {-|
@@ -44,6 +45,11 @@ instance Monoid Poking where
   {-# INLINE mappend #-}
   mappend =
     (<>)
+
+instance IsString Poking where
+  fromString string = Poking (List.length string) io where
+    io ptr = foldM_ step ptr string where
+      step ptr char = A.pokeWord8 ptr (fromIntegral (ord char)) $> plusPtr ptr 1
 
 {-# INLINE null #-}
 null :: Poking -> Bool
