@@ -197,3 +197,20 @@ vector element vectorValue =
             Poking elementByteSize elementIO -> do
               elementIO ptr
               return (plusPtr ptr elementByteSize)
+
+{-# INLINABLE intercalateVector #-}
+intercalateVector :: GenericVector.Vector vector element => (element -> Poking) -> Poking -> vector element -> Poking
+intercalateVector element (Poking separatorLength separatorIo) vectorValue = Poking length io where
+  length = GenericVector.foldl' step 0 vectorValue + ((GenericVector.length vectorValue - 1) * separatorLength) where
+    step length elementValue = case element elementValue of
+      Poking elementLength _ -> length + elementLength
+  indexIsLast = let
+    lastIndex = pred (GenericVector.length vectorValue)
+    in (== lastIndex)
+  io ptr = GenericVector.ifoldM'_ step ptr vectorValue where
+    step ptr index elementValue = case element elementValue of
+      Poking elementLength elementIo -> if indexIsLast index
+        then elementIo ptr $> ptr
+        else let
+          ptrAfterElement = plusPtr ptr elementLength
+          in elementIo ptr *> separatorIo ptrAfterElement $> plusPtr ptrAfterElement separatorLength

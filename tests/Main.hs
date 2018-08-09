@@ -14,6 +14,7 @@ import qualified Ptr.ByteString as A
 import qualified Ptr.Poking as F
 import qualified Ptr.Parse as G
 import qualified Data.ByteString as D
+import qualified Data.Vector.Unboxed as UnboxedVector
 
 
 main =
@@ -42,6 +43,9 @@ main =
       ,
       testCase "fromString" $ do
         assertEqual "" "123" (A.poking "123")
+      ,
+      testCase "intercalateVector" $ do
+        assertEqual "" "1,2,3,4" (A.poking (F.intercalateVector F.asciiIntegral "," (UnboxedVector.fromList [1 :: Word8, 2, 3, 4])))
     ]
     ,
     parsing
@@ -53,7 +57,7 @@ parsing =
   [
     testCase "bytesWhile" $ assertEqual "" "123" (A.parse "123456" (G.bytesWhile (< 52)) undefined undefined)
     ,
-    testCase "bytesWhile 2" $ assertEqual "" "123456" (A.parse "123456" (G.bytesWhile (< 59)) undefined undefined)
+    testCase "bytesWhile 2" $ assertEqual "" (Right "123456") (A.parse "123456" (fmap Right (G.bytesWhile (< 59))) (Left . Left) (Left . Right))
   ]
 
 pokeThenPeek :: B.Poke a -> C.Peek a -> Maybe (a -> a)
