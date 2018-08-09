@@ -8,6 +8,7 @@ import qualified Ptr.PokeAndPeek as D
 import qualified Ptr.PokeIO as E
 import qualified Data.ByteString.Internal as B
 import qualified Data.Vector as F
+import qualified Data.Vector.Generic as GenericVector
 import qualified Data.List as List
 
 
@@ -178,18 +179,18 @@ list element =
         _ -> state <> word8 0
 
 {-# INLINABLE vector #-}
-vector :: (element -> Poking) -> F.Vector element -> Poking
+vector :: GenericVector.Vector vector element => (element -> Poking) -> vector element -> Poking
 vector element vectorValue =
   Poking byteSize io
   where
     byteSize =
-      foldl' step 0 vectorValue
+      GenericVector.foldl' step 0 vectorValue
       where
         step !byteSize elementValue =
           case element elementValue of
             Poking elementByteSize _ -> byteSize + elementByteSize
     io ptr =
-      F.foldM'_ step ptr vectorValue
+      GenericVector.foldM'_ step ptr vectorValue
       where
         step ptr elementValue =
           case element elementValue of
