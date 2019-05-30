@@ -112,25 +112,23 @@ pokeAndPeek :: D.PokeAndPeek input output -> input -> Poking
 pokeAndPeek (D.PokeAndPeek space poke _) input =
   Poking space (\ptr -> poke ptr input)
 
+{-| Unsigned ASCII integral -}
 {-# INLINABLE asciiIntegral #-}
-asciiIntegral :: Integral a => a -> Poking
-asciiIntegral =
-  \case
-    0 ->
-      word8 48
-    x ->
-      bool ((<>) (word8 45)) id (x >= 0) $
-      loop mempty $
-      abs x
-  where
-    loop builder remainder =
-      case remainder of
-        0 ->
-          builder
-        _ ->
-          case quotRem remainder 10 of
-            (quot, rem) ->
-              loop (word8 (48 + fromIntegral rem) <> builder) quot
+asciiIntegral :: (Integral a) => a -> Poking
+asciiIntegral = \ case
+  0 -> word8 48
+  x -> let
+    lastIndex = (floor . logBase 10 . fromIntegral) x
+    size = succ lastIndex
+    action = let
+      loop ptr x = case quotRem x 10 of
+        (quot, rem) -> do
+          A.pokeWord8 ptr (48 + fromIntegral rem)
+          case quot of
+            0 -> return ()
+            _ -> loop (plusPtr ptr (-1)) quot
+      in \ ptr -> loop (plusPtr ptr lastIndex) x
+    in Poking size action
 
 {-# INLINE asciiChar #-}
 asciiChar :: Char -> Poking

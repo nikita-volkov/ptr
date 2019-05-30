@@ -1,7 +1,6 @@
 module Main where
 
 import Prelude
-import Bug
 import Test.Tasty
 import Test.Tasty.Runners
 import Test.Tasty.HUnit
@@ -21,6 +20,11 @@ main =
   defaultMain $
   testGroup "All tests"
   [
+    testProperty "ASCII Numbers ByteString Roundtrip" $ \ (numbers :: [Word64]) -> let
+      expected = foldMap (fromString . show) numbers
+      actual = A.poking (foldMap F.asciiUnsignedIntegral numbers)
+      in expected === actual
+    ,
     testProperty "Poke and peek (bytes)" $ \input -> input === fromJust (pokeThenPeek (B.bytes (D.length input)) (C.bytes (D.length input))) input
     ,
     testProperty "Poke and peek (word8)" $ \input -> input === fromJust (pokeThenPeek B.word8 C.word8) input
