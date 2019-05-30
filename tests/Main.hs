@@ -22,7 +22,7 @@ main =
   [
     testProperty "ASCII Numbers ByteString Roundtrip" $ \ (numbers :: [Word64]) -> let
       expected = foldMap (fromString . show) numbers
-      actual = A.poking (foldMap F.asciiUnsignedIntegral numbers)
+      actual = A.poking (foldMap F.asciiIntegral numbers)
       in expected === actual
     ,
     testProperty "Poke and peek (bytes)" $ \input -> input === fromJust (pokeThenPeek (B.bytes (D.length input)) (C.bytes (D.length input))) input
