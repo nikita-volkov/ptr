@@ -5,6 +5,7 @@ module Ptr.PokeIO
 where
 
 import Ptr.Prelude
+import qualified Ptr.IO as IO
 
 
 type PokeIO =
@@ -25,3 +26,15 @@ concurrently space1 action1 action2 ptr =
       putMVar lock ()
     action2 (plusPtr ptr space1)
     takeMVar lock
+
+{-| Unsigned ASCII integral -}
+{-# INLINE asciiUnsignedIntegral #-}
+asciiUnsignedIntegral :: (Integral a) => Int -> a -> PokeIO
+asciiUnsignedIntegral = let
+  loop ptr x = case quotRem x 10 of
+    (quot, rem) -> do
+      IO.pokeWord8 ptr (48 + fromIntegral rem)
+      case quot of
+        0 -> return ()
+        _ -> loop (plusPtr ptr (-1)) quot
+  in \ lastIndex x ptr -> loop (plusPtr ptr lastIndex) x
