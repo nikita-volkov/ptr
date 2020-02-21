@@ -22,6 +22,7 @@ library
   default-language: Haskell2010
   exposed-modules:
     Ptr.ByteString
+    Ptr.IO
     Ptr.Parse
     Ptr.ParseUnbound
     Ptr.Peek
@@ -30,7 +31,6 @@ library
     Ptr.Poking
     Ptr.Receive
   other-modules:
-    Ptr.IO
     Ptr.PokeIO
     Ptr.Prelude
     Ptr.Receive.Core
