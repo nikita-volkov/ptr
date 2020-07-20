@@ -43,7 +43,7 @@ main =
         assertEqual "" "000" (A.poking (F.asciiPaddedAndTrimmedIntegral 3 (-1)))
       ,
       testCase "asciiUtcTimeInIso8601" $ do
-        assertEqual "" "2017-02-01T05:03:58Z" (A.poking (F.asciiUtcTimeInIso8601 (read "2017-02-01 05:03:58")))
+        assertEqual "" "2017-02-01T05:03:58Z" (A.poking (F.asciiUtcTimeInIso8601 (read "2017-02-01 05:03:58Z")))
       ,
       testCase "fromString" $ do
         assertEqual "" "123" (A.poking "123")
