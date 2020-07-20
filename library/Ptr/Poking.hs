@@ -6,6 +6,7 @@ import qualified Ptr.IO as A
 import qualified Ptr.Poke as C
 import qualified Ptr.PokeAndPeek as D
 import qualified Ptr.PokeIO as E
+import qualified Ptr.List as List
 import qualified Data.ByteString.Internal as B
 import qualified Data.Vector as F
 import qualified Data.Vector.Generic as GenericVector
@@ -118,9 +119,9 @@ asciiIntegral :: (Integral a) => a -> Poking
 asciiIntegral = \ case
   0 -> word8 48
   x -> let
-    lastIndex = (floor . logBase 10 . fromIntegral) x
-    size = succ lastIndex
-    action = E.asciiUnsignedIntegral lastIndex x
+    reverseDigits = List.reverseDigits 10 x
+    size = List.length reverseDigits
+    action = E.reverseAsciiDigits (pred size) reverseDigits
     in Poking size action
 
 {-# INLINE asciiChar #-}

@@ -38,3 +38,15 @@ asciiUnsignedIntegral = let
         0 -> return ()
         _ -> loop (plusPtr ptr (-1)) quot
   in \ lastIndex x ptr -> loop (plusPtr ptr lastIndex) x
+
+{-# INLINE reverseAsciiDigits #-}
+reverseAsciiDigits :: (Integral a) => Int -> [a] -> PokeIO
+reverseAsciiDigits index elements ptr =
+  let
+    loop ptr =
+      \ case
+        digit : tail -> do
+          IO.pokeWord8 ptr (48 + fromIntegral digit)
+          loop (plusPtr ptr (-1)) tail
+        _ -> return ()
+    in loop (plusPtr ptr index) elements

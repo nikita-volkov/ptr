@@ -35,6 +35,7 @@ library
     Ptr.Prelude
     Ptr.Receive.Core
     Ptr.UncheckedShifting
+    Ptr.List
   build-depends:
     base >=4.9 && <5,
     bytestring >=0.10 && <0.11,
