@@ -1,5 +1,5 @@
 name: ptr
-version: 0.16.7
+version: 0.16.7.1
 category: Ptr, Data
 synopsis: Abstractions for operations on pointers
 homepage: https://github.com/nikita-volkov/ptr
