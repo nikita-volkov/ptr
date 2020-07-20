@@ -53,6 +53,11 @@ main =
     ]
     ,
     parsing
+    ,
+    testGroup "Regression" [
+        testCase "https://github.com/nikita-volkov/hasql-dynamic-statements/issues/2" $
+          assertEqual "" "$1000" (A.poking (F.word8 36 <> F.asciiIntegral 1000))
+      ]
   ]
 
 parsing :: TestTree
