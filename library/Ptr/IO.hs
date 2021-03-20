@@ -98,6 +98,90 @@ peekLEWord64 =
   peekStorable
 #endif
 
+{-# INLINE peekInt8 #-}
+peekInt8 :: Ptr Word8 -> IO Int8
+peekInt8 =
+  {-# SCC "peekInt8" #-} 
+  peekStorable
+
+-- | Big-endian int of 2 bytes.
+{-# INLINE peekBEInt16 #-}
+peekBEInt16 :: Ptr Word8 -> IO Int16
+#ifdef WORDS_BIGENDIAN
+peekBEInt16 =
+  {-# SCC "peekBEInt16" #-} 
+  peekStorable
+#else
+peekBEInt16 =
+  {-# SCC "peekBEInt16" #-} 
+  fmap (fromIntegral . byteSwap16) . peekStorable
+#endif
+
+-- | Little-endian int of 2 bytes.
+{-# INLINE peekLEInt16 #-}
+peekLEInt16 :: Ptr Word8 -> IO Int16
+#ifdef WORDS_BIGENDIAN
+peekLEInt16 =
+  {-# SCC "peekLEInt16" #-} 
+  fmap (fromIntegral . byteSwap16) . peekStorable
+#else
+peekLEInt16 =
+  {-# SCC "peekLEInt16" #-} 
+  peekStorable
+#endif
+
+-- | Big-endian int of 4 bytes.
+{-# INLINE peekBEInt32 #-}
+peekBEInt32 :: Ptr Word8 -> IO Int32
+#ifdef WORDS_BIGENDIAN
+peekBEInt32 =
+  {-# SCC "peekBEInt32" #-} 
+  peekStorable
+#else
+peekBEInt32 =
+  {-# SCC "peekBEInt32" #-} 
+  fmap (fromIntegral . byteSwap32) . peekStorable
+#endif
+
+-- | Little-endian int of 4 bytes.
+{-# INLINE peekLEInt32 #-}
+peekLEInt32 :: Ptr Word8 -> IO Int32
+#ifdef WORDS_BIGENDIAN
+peekLEInt32 =
+  {-# SCC "peekLEInt32" #-} 
+  fmap (fromIntegral . byteSwap32) . peekStorable
+#else
+peekLEInt32 =
+  {-# SCC "peekLEInt32" #-} 
+  peekStorable
+#endif
+
+-- | Big-endian int of 8 bytes.
+{-# INLINE peekBEInt64 #-}
+peekBEInt64 :: Ptr Word8 -> IO Int64
+#ifdef WORDS_BIGENDIAN
+peekBEInt64 =
+  {-# SCC "peekBEInt64" #-} 
+  peekStorable
+#else
+peekBEInt64 =
+  {-# SCC "peekBEInt64" #-} 
+  fmap (fromIntegral . byteSwap64) . peekStorable
+#endif
+
+-- | Little-endian int of 8 bytes.
+{-# INLINE peekLEInt64 #-}
+peekLEInt64 :: Ptr Word8 -> IO Int64
+#ifdef WORDS_BIGENDIAN
+peekLEInt64 =
+  {-# SCC "peekLEInt64" #-} 
+  fmap (fromIntegral . byteSwap64) . peekStorable
+#else
+peekLEInt64 =
+  {-# SCC "peekLEInt64" #-} 
+  peekStorable
+#endif
+
 {-|
 Allocate a new byte array with @memcpy@.
 -}
