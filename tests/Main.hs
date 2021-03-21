@@ -1,10 +1,11 @@
 module Main where
 
-import Prelude
+import Prelude hiding (choose)
 import Test.Tasty
 import Test.Tasty.Runners
 import Test.Tasty.HUnit
 import Test.Tasty.QuickCheck
+import Test.QuickCheck
 import Test.QuickCheck.Instances
 import qualified Ptr.Poke as B
 import qualified Ptr.Peek as C
@@ -14,6 +15,7 @@ import qualified Ptr.Poking as F
 import qualified Ptr.Parse as G
 import qualified Ptr.Read as H
 import qualified Data.ByteString as D
+import qualified Data.ByteString.Char8 as I
 import qualified Data.Vector.Unboxed as UnboxedVector
 
 
@@ -96,6 +98,10 @@ main =
           againstByteString
             (H.skipWhile (< a) *> H.byteString (max 0 b))
             (D.dropWhile (< a) >>> D.take b)
+        ,
+        testProperty "asciiIntegral"
+          $ forAll (arbitrary @Int >>= splitRandomly . fromString . (<> " ") . show . abs)
+          $ againstByteString (H.asciiIntegral) (read . I.unpack)
       ]
   ]
 
@@ -129,3 +135,16 @@ pokeAndPeek (E.PokeAndPeek size poke peek) input =
     withForeignPtr fp $ \p -> do
       poke p input
       peek p
+
+splitRandomly :: ByteString -> Gen [ByteString]
+splitRandomly =
+  fmap reverse . buildReverse []
+  where
+    buildReverse chunks input =
+      if D.null input
+        then pure chunks
+        else do
+          chunkLength <- choose (0, D.length input)
+          traceM (show (chunkLength, input, chunks))
+          D.splitAt chunkLength input & \(l, r) -> do
+            buildReverse (l : chunks) r
