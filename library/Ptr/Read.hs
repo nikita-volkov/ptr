@@ -163,11 +163,11 @@ byteStringWhile predicate =
       populateChunk startPtr
       where
         populateChunk curPtr =
-          if nextPtr <= endPtr
+          if curPtr < endPtr
             then do
               w <- IO.peekWord8 curPtr
               if predicate w
-                then populateChunk nextPtr
+                then populateChunk (plusPtr curPtr 1)
                 else let
                   chunkLength =
                     minusPtr curPtr startPtr
@@ -184,7 +184,7 @@ byteStringWhile predicate =
                   in return (FinishedStatus curPtr merged)
             else let
               chunkLength =
-                minusPtr nextPtr startPtr
+                minusPtr endPtr startPtr
               !chunk =
                 ByteString.fromPtrWithSize chunkLength startPtr
               newTotalLength =
@@ -192,9 +192,6 @@ byteStringWhile predicate =
               newChunks =
                 Cons chunk chunks
               in return (UnfinishedStatus (Read (collectChunks newTotalLength newChunks)))
-          where
-            nextPtr =
-              plusPtr startPtr 1
 
 foldlWhile' :: (Word8 -> Bool) -> (acc -> Word8 -> acc) -> acc -> Read acc
 foldlWhile' predicate step =

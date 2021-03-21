@@ -97,6 +97,11 @@ main =
             (H.skipWhile (< a) *> H.byteString (max 0 b))
             (D.dropWhile (< a) >>> D.take b)
         ,
+        testProperty "byteStringWhile" $ \a ->
+          againstByteString
+            (H.byteStringWhile (< a))
+            (D.takeWhile (< a))
+        ,
         testProperty "asciiIntegral"
           $ forAll (arbitrary @Int >>= splitRandomly . fromString . (<> " ") . show . abs)
           $ againstByteString (H.asciiIntegral) (read . I.unpack)
@@ -112,6 +117,11 @@ main =
         testProperty "int64InBe"
           $ forAll (arbitrary @Int64 >>= splitRandomly . J.runPut . J.putInt64be)
           $ againstCereal H.int64InBe J.getInt64be
+        ,
+        testProperty "nullTerminatedByteString"
+          $ againstByteString
+            (H.nullTerminatedByteString)
+            (D.takeWhile (/=0))
       ]
   ]
 
