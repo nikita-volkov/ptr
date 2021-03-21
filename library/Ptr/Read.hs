@@ -1,4 +1,19 @@
 module Ptr.Read
+(
+  Read,
+  runOnByteString,
+  skip,
+  skipWhile,
+  byteString,
+  byteStringWhile,
+  foldlWhile',
+  word8,
+  int16InBe,
+  int32InBe,
+  int64InBe,
+  nullTerminatedByteString,
+  asciiIntegral,
+)
 where
 
 import Ptr.Prelude hiding (Read)
