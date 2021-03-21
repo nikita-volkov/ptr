@@ -69,21 +69,33 @@ main =
             Right (res, rem) -> Just res
         _ ->
           Nothing
-      againstByteString :: (Eq a, Show a) => (ByteString -> a) -> H.Read a -> [ByteString] -> Property
-      againstByteString fromByteString read chunks =
+      validate :: (Eq a, Show a) => H.Read a -> (ByteString -> a -> Property) -> [ByteString] -> Property
+      validate read validate chunks =
+        consumeManyByteStrings read chunks & \case
+          Nothing ->
+            discard
+          Just res ->
+            validate (mconcat chunks) res
+      againstByteString :: (Eq a, Show a) => H.Read a -> (ByteString -> a) -> [ByteString] -> Property
+      againstByteString read fromByteString chunks =
         consumeManyByteStrings read chunks & \case
           Nothing ->
             discard
           Just res ->
             fromByteString (mconcat chunks) === res
       in [
-        testProperty "byteString"
-          $ \a -> againstByteString (D.take a) (H.byteString (max 0 a))
+        testProperty "byteString" $ \a ->
+          againstByteString (H.byteString (max 0 a)) (D.take a)
         ,
         testProperty "skip & byteString" $ \a b ->
           againstByteString
-            (D.take b . D.drop a)
             (H.skip (max 0 a) *> H.byteString (max 0 b))
+            (D.take b . D.drop a)
+        ,
+        testProperty "skipWhile" $ \a b ->
+          againstByteString
+            (H.skipWhile (< a) *> H.byteString (max 0 b))
+            (D.dropWhile (< a) >>> D.take b)
       ]
   ]
 
