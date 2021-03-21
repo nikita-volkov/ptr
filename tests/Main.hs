@@ -122,6 +122,21 @@ main =
           $ againstByteString
             (H.nullTerminatedByteString)
             (D.takeWhile (/=0))
+        ,
+        testCase "Pure does not hold on empty input"
+          $ assertEqual "" (Just ()) (consumeManyByteStrings (pure ()) [""])
+        ,
+        testCase "Monadic composition"
+          $ do
+            let input = J.runPut (J.putInt32be 1 <> J.putInt32be 2)
+            consumeManyByteStrings (liftM2 (,) H.int32InBe H.int32InBe) [input]
+              & assertEqual "" (Just (1, 2))
+        ,
+        testCase "Applicative composition"
+          $ do
+            let input = J.runPut (J.putInt32be 1 <> J.putInt32be 2)
+            consumeManyByteStrings (liftA2 (,) H.int32InBe H.int32InBe) [input]
+              & assertEqual "" (Just (1, 2))
       ]
   ]
 
