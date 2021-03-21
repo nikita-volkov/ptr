@@ -31,6 +31,7 @@ library
     Ptr.Poke
     Ptr.PokeAndPeek
     Ptr.Poking
+    Ptr.Read
     Ptr.Receive
   other-modules:
     Ptr.List
@@ -38,11 +39,14 @@ library
     Ptr.Prelude
     Ptr.Receive.Core
     Ptr.UncheckedShifting
+    Ptr.Util.ByteString
+    Ptr.Util.Word8Predicates
   build-depends:
     base >=4.11 && <5,
     bytestring >=0.10 && <0.12,
     contravariant >=1.3 && <2,
     profunctors >=5.1 && <6,
+    strict-list >=0.1.5 && <0.2,
     text ==1.*,
     time >=1 && <2,
     vector >=0.12 && <0.13
