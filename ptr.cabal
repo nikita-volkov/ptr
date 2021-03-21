@@ -1,7 +1,9 @@
 name: ptr
 version: 0.16.8.1
 category: Ptr, Data
-synopsis: Abstractions for operations on pointers
+synopsis: Experimental abstractions for operations on pointers
+description:
+  Collection of experimental abstractions over pointer operations.
 homepage: https://github.com/nikita-volkov/ptr
 bug-reports: https://github.com/nikita-volkov/ptr/issues
 author: Nikita Volkov <nikita.y.volkov@mail.ru>
