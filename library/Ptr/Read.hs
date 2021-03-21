@@ -30,9 +30,6 @@ Deserializer highly optimized to reading from pointers.
 Parsing ByteString is just a special case.
 -}
 newtype Read a =
-  {-|
-  It's safe to assume that at least 1 byte is available.
-  -}
   Read (Ptr Word8 -> Ptr Word8 -> IO (Status a))
 
 instance Functor Read where
@@ -46,9 +43,7 @@ instance Applicative Read where
     Read $ \start end -> do
       lGetStatus start end >>= \case
         FinishedStatus lAfter lRes ->
-          if lAfter < end
-            then rGetStatus lAfter end & fmap (fmap lRes)
-            else return (UnfinishedStatus (fmap lRes (Read rGetStatus)))
+          rGetStatus lAfter end & fmap (fmap lRes)
         UnfinishedStatus lNextPeek ->
           return (UnfinishedStatus (lNextPeek <*> Read rGetStatus))
 
@@ -58,9 +53,7 @@ instance Monad Read where
     Read $ \start end ->
       lGetStatus start end >>= \case
         FinishedStatus lAfter lRes ->
-          if lAfter < end
-            then k lRes & \(Read rGetStatus) -> rGetStatus lAfter end
-            else return (UnfinishedStatus (k lRes))
+          k lRes & \(Read rGetStatus) -> rGetStatus lAfter end
         UnfinishedStatus lNextPeek ->
           return (UnfinishedStatus (lNextPeek >>= k))
 
@@ -81,22 +74,19 @@ data Status a =
 
 runOnByteString :: Read a -> ByteString -> Either (Read a) (a, ByteString)
 runOnByteString (Read read) (ByteString.PS bsFp bsOff bsSize) =
-  if bsSize == 0
-    then Left (Read read)
-    else
-      unsafePerformIO $
-      withForeignPtr bsFp $ \p ->
-        let
-          startP = plusPtr p bsOff
-          endP = plusPtr startP bsSize
-          in
-            read startP endP <&> \case
-              FinishedStatus newStartP res ->
-                let newBsOff = minusPtr newStartP p
-                    newBs = ByteString.PS bsFp newBsOff (bsSize - (newBsOff - bsOff))
-                    in Right (res, newBs)
-              UnfinishedStatus next ->
-                Left next
+  unsafePerformIO $
+  withForeignPtr bsFp $ \p ->
+    let
+      startP = plusPtr p bsOff
+      endP = plusPtr startP bsSize
+      in
+        read startP endP <&> \case
+          FinishedStatus newStartP res ->
+            let newBsOff = minusPtr newStartP p
+                newBs = ByteString.PS bsFp newBsOff (bsSize - (newBsOff - bsOff))
+                in Right (res, newBs)
+          UnfinishedStatus next ->
+            Left next
 
 
 -- *
@@ -229,26 +219,35 @@ foldlWhile' predicate step =
 
 word8 :: Read Word8
 word8 =
-  Read $ \start end -> let
-    post = plusPtr start 1
-    in IO.peekWord8 start <&> FinishedStatus post
+  Read $ \start end ->
+    if end > start
+      then IO.peekWord8 start <&> FinishedStatus (plusPtr start 1)
+      else return (UnfinishedStatus word8)
 
 int16InBe :: Read Int16
 int16InBe =
-  with0
+  Read inWhole
   where
-    with0 =
-      Read $ \start end -> let
-        completePost = plusPtr start 2
-        in if completePost <= end
-          then
-            IO.peekBEInt16 start <&> FinishedStatus completePost
-          else
-            IO.peekWord8 start <&> UnfinishedStatus . with1 . fromIntegral
-    with1 !acc =
-      Read $ \start end ->
-        IO.peekWord8 start
-          <&> \w -> FinishedStatus (plusPtr start 1) (unsafeShiftL acc 8 .|. fromIntegral w)
+    inWhole start end =
+      if inWholePost <= end
+        then
+          IO.peekBEInt16 start <&> FinishedStatus inWholePost
+        else
+          bytely 2 0 start end
+      where
+        inWholePost = plusPtr start 2
+    bytely !needed !acc start end =
+      if start < end
+        then
+          do
+            w <- IO.peekWord8 start
+            let newAcc = unsafeShiftL acc 8 .|. fromIntegral w
+                newStart = plusPtr start 1
+                in if needed > 1
+                  then bytely (pred needed) newAcc newStart end
+                  else return (FinishedStatus newStart newAcc)
+        else
+          return (UnfinishedStatus (Read (bytely needed acc)))
 
 int32InBe :: Read Int32
 int32InBe =
@@ -259,9 +258,7 @@ int32InBe =
         then
           IO.peekBEInt32 start <&> FinishedStatus inWholePost
         else
-          do
-            w <- IO.peekWord8 start
-            bytely 3 (fromIntegral w) (plusPtr start 1) end
+          bytely 4 0 start end
       where
         inWholePost = plusPtr start 4
     bytely !needed !acc start end =
@@ -286,9 +283,7 @@ int64InBe =
         then
           IO.peekBEInt64 start <&> FinishedStatus inWholePost
         else
-          do
-            w <- IO.peekWord8 start
-            bytely 7 (fromIntegral w) (plusPtr start 1) end
+          bytely 8 0 start end
       where
         inWholePost = plusPtr start 8
     bytely !needed !acc start end =
