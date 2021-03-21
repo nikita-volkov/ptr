@@ -101,4 +101,4 @@ import Data.Time as Exports
 
 -- strict-list
 -------------------------
-import StrictList as Exports (List)
+import StrictList as Exports (List(..))

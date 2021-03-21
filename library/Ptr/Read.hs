@@ -87,11 +87,18 @@ runOnByteString (Read read) (ByteString.PS bsFp bsOff bsSize) =
 -- *
 -------------------------
 
-skip :: Int -> Read ()
+skip ::
+  {-|
+  Amount of bytes to skip.
+  
+  __Warning:__ It is your responsibility to ensure that it is not negative.
+  -}
+  Int ->
+  Read ()
 skip =
   Read . loop
   where
-    loop !needed start end =
+    loop needed start end =
       if post <= end
         then return (FinishedStatus post ())
         else return (UnfinishedStatus (Read (loop nextNeeded)))
@@ -114,48 +121,43 @@ skipWhile predicate =
       where
         post = plusPtr start 1
 
-byteString :: Int -> Read ByteString
+byteString ::
+  {-|
+  Size of the bytestring.
+
+  __Warning:__ It is your responsibility to ensure that it is not negative.
+  -}
+  Int ->
+  Read ByteString
 byteString totalNeededSize =
-  Read (collectChunks totalNeededSize StrictList.Nil)
+  Read (collectChunks totalNeededSize Nil)
   where
     collectChunks neededSize chunks startPtr endPtr =
-      populateChunk neededSize startPtr
-      where
-        populateChunk neededSize curPtr =
-          if neededSize > 0
-            then if nextPtr <= endPtr
-              then
-                populateChunk (pred neededSize) nextPtr
-              else let
-                chunkLength =
-                  minusPtr nextPtr startPtr
-                !chunk =
-                  ByteString.fromPtrWithSize chunkLength startPtr
-                in
-                  return (UnfinishedStatus (Read (collectChunks
-                    (pred neededSize)
-                    (StrictList.Cons chunk chunks))))
-            else let
-              chunkLength =
-                minusPtr nextPtr startPtr
-              !chunk =
-                ByteString.fromPtrWithSize chunkLength startPtr
-              merged =
-                case chunks of
-                  StrictList.Nil ->
-                    chunk
-                  _ ->
-                    ByteString.fromReverseStrictListWithSize
-                      (totalNeededSize)
-                      (StrictList.Cons chunk chunks)
+      let
+        nextPtr = plusPtr startPtr neededSize
+        in
+          -- If there's enough
+          if nextPtr <= endPtr
+            then let
+              lastChunkLength = minusPtr nextPtr startPtr
+              !chunk = ByteString.fromPtrWithSize lastChunkLength startPtr
+              merged = case chunks of
+                Nil -> chunk
+                _ ->
+                  ByteString.fromReverseStrictListWithSize totalNeededSize
+                    (Cons chunk chunks)
               in return (FinishedStatus nextPtr merged)
-          where
-            nextPtr =
-              plusPtr curPtr 1
+            else let
+              lastChunkLength = minusPtr endPtr startPtr
+              !chunk = ByteString.fromPtrWithSize lastChunkLength startPtr
+              newNeededSize = neededSize - lastChunkLength
+              newChunks = Cons chunk chunks
+              loop = collectChunks newNeededSize newChunks
+              in return (UnfinishedStatus (Read loop))
 
 byteStringWhile :: (Word8 -> Bool) -> Read ByteString
 byteStringWhile predicate =
-  Read (collectChunks 0 StrictList.Nil)
+  Read (collectChunks 0 Nil)
   where
     collectChunks totalLength chunks startPtr endPtr =
       populateChunk startPtr
@@ -173,12 +175,12 @@ byteStringWhile predicate =
                     ByteString.fromPtrWithSize chunkLength startPtr
                   merged =
                     case chunks of
-                      StrictList.Nil ->
+                      Nil ->
                         chunk
                       _ ->
                         ByteString.fromReverseStrictListWithSize
                           (totalLength + chunkLength)
-                          (StrictList.Cons chunk chunks)
+                          (Cons chunk chunks)
                   in return (FinishedStatus curPtr merged)
             else let
               chunkLength =
@@ -188,7 +190,7 @@ byteStringWhile predicate =
               newTotalLength =
                 totalLength + chunkLength
               newChunks =
-                StrictList.Cons chunk chunks
+                Cons chunk chunks
               in return (UnfinishedStatus (Read (collectChunks newTotalLength newChunks)))
           where
             nextPtr =

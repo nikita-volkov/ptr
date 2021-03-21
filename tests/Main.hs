@@ -77,10 +77,13 @@ main =
           Just res ->
             fromByteString (mconcat chunks) === res
       in [
-        testProperty "Multipart" $ \a b ->
+        testProperty "byteString"
+          $ \a -> againstByteString (D.take a) (H.byteString (max 0 a))
+        ,
+        testProperty "skip & byteString" $ \a b ->
           againstByteString
             (D.take b . D.drop a)
-            (H.skip a *> H.byteString b)
+            (H.skip (max 0 a) *> H.byteString (max 0 b))
       ]
   ]
 
