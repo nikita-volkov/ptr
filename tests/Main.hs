@@ -12,6 +12,7 @@ import qualified Ptr.PokeAndPeek as E
 import qualified Ptr.ByteString as A
 import qualified Ptr.Poking as F
 import qualified Ptr.Parse as G
+import qualified Ptr.Read as H
 import qualified Data.ByteString as D
 import qualified Data.Vector.Unboxed as UnboxedVector
 
@@ -57,6 +58,29 @@ main =
     testGroup "Regression" [
         testCase "https://github.com/nikita-volkov/hasql-dynamic-statements/issues/2" $
           assertEqual "" "$1000" (A.poking (F.word8 36 <> F.asciiIntegral 1000))
+      ]
+    ,
+    testGroup "Read" $ let
+      consumeManyByteStrings :: H.Read a -> [ByteString] -> Maybe a
+      consumeManyByteStrings read = \case
+        head : tail ->
+          H.runOnByteString read head & \case
+            Left newRead -> consumeManyByteStrings newRead tail
+            Right (res, rem) -> Just res
+        _ ->
+          Nothing
+      againstByteString :: (Eq a, Show a) => (ByteString -> a) -> H.Read a -> [ByteString] -> Property
+      againstByteString fromByteString read chunks =
+        consumeManyByteStrings read chunks & \case
+          Nothing ->
+            discard
+          Just res ->
+            fromByteString (mconcat chunks) === res
+      in [
+        testProperty "Multipart" $ \a b ->
+          againstByteString
+            (D.take b . D.drop a)
+            (H.skip a *> H.byteString b)
       ]
   ]
 
