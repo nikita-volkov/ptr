@@ -16,7 +16,8 @@ import qualified Ptr.Parse as G
 import qualified Ptr.Read as H
 import qualified Data.ByteString as D
 import qualified Data.ByteString.Char8 as I
-import qualified Data.Vector.Unboxed as UnboxedVector
+import qualified Data.Vector.Unboxed as K
+import qualified Data.Serialize as J
 
 
 main =
@@ -52,7 +53,7 @@ main =
         assertEqual "" "123" (A.poking "123")
       ,
       testCase "intercalateVector" $ do
-        assertEqual "" "1,2,3,4" (A.poking (F.intercalateVector F.asciiIntegral "," (UnboxedVector.fromList [1 :: Word8, 2, 3, 4])))
+        assertEqual "" "1,2,3,4" (A.poking (F.intercalateVector F.asciiIntegral "," (K.fromList [1 :: Word8, 2, 3, 4])))
     ]
     ,
     parsing
@@ -71,13 +72,6 @@ main =
             Right (res, rem) -> Just res
         _ ->
           Nothing
-      validate :: (Eq a, Show a) => H.Read a -> (ByteString -> a -> Property) -> [ByteString] -> Property
-      validate read validate chunks =
-        consumeManyByteStrings read chunks & \case
-          Nothing ->
-            discard
-          Just res ->
-            validate (mconcat chunks) res
       againstByteString :: (Eq a, Show a) => H.Read a -> (ByteString -> a) -> [ByteString] -> Property
       againstByteString read fromByteString chunks =
         consumeManyByteStrings read chunks & \case
@@ -85,6 +79,10 @@ main =
             discard
           Just res ->
             fromByteString (mconcat chunks) === res
+      againstCereal :: (Eq a, Show a) => H.Read a -> J.Get a -> [ByteString] -> Property
+      againstCereal read get chunks =
+        consumeManyByteStrings read chunks & \res ->
+          J.runGet get (mconcat chunks) === maybe (Left "Not enough input") Right res
       in [
         testProperty "byteString" $ \a ->
           againstByteString (H.byteString (max 0 a)) (D.take a)
@@ -102,6 +100,18 @@ main =
         testProperty "asciiIntegral"
           $ forAll (arbitrary @Int >>= splitRandomly . fromString . (<> " ") . show . abs)
           $ againstByteString (H.asciiIntegral) (read . I.unpack)
+        ,
+        testProperty "int16InBe"
+          $ forAll (arbitrary @Int16 >>= splitRandomly . J.runPut . J.putInt16be)
+          $ againstCereal H.int16InBe J.getInt16be
+        ,
+        testProperty "int32InBe"
+          $ forAll (arbitrary @Int32 >>= splitRandomly . J.runPut . J.putInt32be)
+          $ againstCereal H.int32InBe J.getInt32be
+        ,
+        testProperty "int64InBe"
+          $ forAll (arbitrary @Int64 >>= splitRandomly . J.runPut . J.putInt64be)
+          $ againstCereal H.int64InBe J.getInt64be
       ]
   ]
 
@@ -145,6 +155,5 @@ splitRandomly =
         then pure chunks
         else do
           chunkLength <- choose (0, D.length input)
-          traceM (show (chunkLength, input, chunks))
           D.splitAt chunkLength input & \(l, r) -> do
             buildReverse (l : chunks) r
