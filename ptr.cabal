@@ -33,11 +33,11 @@ library
     Ptr.Poking
     Ptr.Receive
   other-modules:
+    Ptr.List
     Ptr.PokeIO
     Ptr.Prelude
     Ptr.Receive.Core
     Ptr.UncheckedShifting
-    Ptr.List
   build-depends:
     base >=4.11 && <5,
     bytestring >=0.10 && <0.12,
