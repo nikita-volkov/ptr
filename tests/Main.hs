@@ -1,10 +1,11 @@
 module Main where
 
-import Prelude
+import Prelude hiding (choose)
 import Test.Tasty
 import Test.Tasty.Runners
 import Test.Tasty.HUnit
 import Test.Tasty.QuickCheck
+import Test.QuickCheck
 import Test.QuickCheck.Instances
 import qualified Ptr.Poke as B
 import qualified Ptr.Peek as C
@@ -12,8 +13,11 @@ import qualified Ptr.PokeAndPeek as E
 import qualified Ptr.ByteString as A
 import qualified Ptr.Poking as F
 import qualified Ptr.Parse as G
+import qualified Ptr.Read as H
 import qualified Data.ByteString as D
-import qualified Data.Vector.Unboxed as UnboxedVector
+import qualified Data.ByteString.Char8 as I
+import qualified Data.Vector.Unboxed as K
+import qualified Data.Serialize as J
 
 
 main =
@@ -49,7 +53,7 @@ main =
         assertEqual "" "123" (A.poking "123")
       ,
       testCase "intercalateVector" $ do
-        assertEqual "" "1,2,3,4" (A.poking (F.intercalateVector F.asciiIntegral "," (UnboxedVector.fromList [1 :: Word8, 2, 3, 4])))
+        assertEqual "" "1,2,3,4" (A.poking (F.intercalateVector F.asciiIntegral "," (K.fromList [1 :: Word8, 2, 3, 4])))
     ]
     ,
     parsing
@@ -57,6 +61,67 @@ main =
     testGroup "Regression" [
         testCase "https://github.com/nikita-volkov/hasql-dynamic-statements/issues/2" $
           assertEqual "" "$1000" (A.poking (F.word8 36 <> F.asciiIntegral 1000))
+      ]
+    ,
+    testGroup "Read" $ let
+      consumeManyByteStrings :: H.Read a -> [ByteString] -> Maybe a
+      consumeManyByteStrings read = \case
+        head : tail ->
+          H.runOnByteString read head & \case
+            Left newRead -> consumeManyByteStrings newRead tail
+            Right (res, rem) -> Just res
+        _ ->
+          Nothing
+      againstByteString :: (Eq a, Show a) => H.Read a -> (ByteString -> a) -> [ByteString] -> Property
+      againstByteString read fromByteString chunks =
+        consumeManyByteStrings read chunks & \case
+          Nothing ->
+            discard
+          Just res ->
+            fromByteString (mconcat chunks) === res
+      againstCereal :: (Eq a, Show a) => H.Read a -> J.Get a -> [ByteString] -> Property
+      againstCereal read get chunks =
+        consumeManyByteStrings read chunks & \res ->
+          J.runGet get (mconcat chunks) === maybe (Left "Not enough input") Right res
+      in [
+        testProperty "byteString" $ \a ->
+          againstByteString (H.byteString (max 0 a)) (D.take a)
+        ,
+        testProperty "skip & byteString" $ \a b ->
+          againstByteString
+            (H.skip (max 0 a) *> H.byteString (max 0 b))
+            (D.take b . D.drop a)
+        ,
+        testProperty "skipWhile" $ \a b ->
+          againstByteString
+            (H.skipWhile (< a) *> H.byteString (max 0 b))
+            (D.dropWhile (< a) >>> D.take b)
+        ,
+        testProperty "byteStringWhile" $ \a ->
+          againstByteString
+            (H.byteStringWhile (< a))
+            (D.takeWhile (< a))
+        ,
+        testProperty "asciiIntegral"
+          $ forAll (arbitrary @Int >>= splitRandomly . fromString . (<> " ") . show . abs)
+          $ againstByteString (H.asciiIntegral) (read . I.unpack)
+        ,
+        testProperty "int16InBe"
+          $ forAll (arbitrary @Int16 >>= splitRandomly . J.runPut . J.putInt16be)
+          $ againstCereal H.int16InBe J.getInt16be
+        ,
+        testProperty "int32InBe"
+          $ forAll (arbitrary @Int32 >>= splitRandomly . J.runPut . J.putInt32be)
+          $ againstCereal H.int32InBe J.getInt32be
+        ,
+        testProperty "int64InBe"
+          $ forAll (arbitrary @Int64 >>= splitRandomly . J.runPut . J.putInt64be)
+          $ againstCereal H.int64InBe J.getInt64be
+        ,
+        testProperty "nullTerminatedByteString"
+          $ againstByteString
+            (H.nullTerminatedByteString)
+            (D.takeWhile (/=0))
       ]
   ]
 
@@ -90,3 +155,15 @@ pokeAndPeek (E.PokeAndPeek size poke peek) input =
     withForeignPtr fp $ \p -> do
       poke p input
       peek p
+
+splitRandomly :: ByteString -> Gen [ByteString]
+splitRandomly =
+  fmap reverse . buildReverse []
+  where
+    buildReverse chunks input =
+      if D.null input
+        then pure chunks
+        else do
+          chunkLength <- choose (0, D.length input)
+          D.splitAt chunkLength input & \(l, r) -> do
+            buildReverse (l : chunks) r

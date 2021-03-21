@@ -98,3 +98,7 @@ import Data.Text as Exports (Text)
 -- time
 -------------------------
 import Data.Time as Exports
+
+-- strict-list
+-------------------------
+import StrictList as Exports (List(..))
