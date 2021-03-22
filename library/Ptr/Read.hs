@@ -1,6 +1,8 @@
 module Ptr.Read
 (
   Read,
+  Status(..),
+  runOnPtr,
   runOnByteString,
   runOnByteStringFinishing,
   skip,
@@ -72,6 +74,10 @@ data Status a =
 
 -- *
 -------------------------
+
+runOnPtr :: Read a -> Ptr Word8 -> Ptr Word8 -> IO (Status a)
+runOnPtr =
+  coerce
 
 runOnByteString :: Read a -> ByteString -> Either (Read a) (a, ByteString)
 runOnByteString (Read read) (ByteString.PS bsFp bsOff bsSize) =
