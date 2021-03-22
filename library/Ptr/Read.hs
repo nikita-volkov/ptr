@@ -2,6 +2,7 @@ module Ptr.Read
 (
   Read,
   runOnByteString,
+  runOnByteStringFinishing,
   skip,
   skipWhile,
   byteString,
@@ -87,6 +88,11 @@ runOnByteString (Read read) (ByteString.PS bsFp bsOff bsSize) =
                 in Right (res, newBs)
           UnfinishedStatus next ->
             Left next
+
+runOnByteStringFinishing :: Read a -> ByteString -> Maybe a
+runOnByteStringFinishing read byteString =
+  runOnByteString read byteString
+    & either (const Nothing) (Just . fst)
 
 
 -- *
