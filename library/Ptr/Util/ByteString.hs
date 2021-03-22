@@ -1,7 +1,8 @@
 module Ptr.Util.ByteString
 where
 
-import Ptr.Prelude
+import Ptr.Prelude hiding (length)
+import Data.ByteString
 import Data.ByteString.Internal
 import qualified StrictList
 import qualified Data.ByteString as ByteString
@@ -12,8 +13,8 @@ __Warning:__
 
 It is your responsibility to ensure that the size is correct.
 -}
-fromReverseStrictListWithSize :: Int -> List ByteString -> ByteString
-fromReverseStrictListWithSize size chunks =
+fromReverseStrictList :: Int -> List ByteString -> ByteString
+fromReverseStrictList size chunks =
   unsafeCreate size (\ptr -> loop (plusPtr ptr size) chunks)
   where
     loop endPtr =
@@ -27,6 +28,12 @@ fromReverseStrictListWithSize size chunks =
         StrictList.Nil ->
           return ()
 
-fromPtrWithSize :: Int -> Ptr Word8 -> ByteString
-fromPtrWithSize size src =
+fromReverseStrictListWithHead :: ByteString -> Int -> List ByteString -> ByteString
+fromReverseStrictListWithHead head sizeInTail tail =
+  if sizeInTail == 0
+    then head
+    else fromReverseStrictList (sizeInTail + length head) (StrictList.Cons head tail)
+
+fromPtr :: Int -> Ptr Word8 -> ByteString
+fromPtr size src =
   unsafeCreate size (\dst -> memcpy dst src size)

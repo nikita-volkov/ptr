@@ -151,16 +151,12 @@ byteString totalNeededSize =
           if nextPtr <= endPtr
             then let
               lastChunkLength = minusPtr nextPtr startPtr
-              !chunk = ByteString.fromPtrWithSize lastChunkLength startPtr
-              merged = case chunks of
-                Nil -> chunk
-                _ ->
-                  ByteString.fromReverseStrictListWithSize totalNeededSize
-                    (Cons chunk chunks)
+              !chunk = ByteString.fromPtr lastChunkLength startPtr
+              merged = ByteString.fromReverseStrictListWithHead chunk (totalNeededSize - lastChunkLength) chunks
               in return (FinishedStatus nextPtr merged)
             else let
               lastChunkLength = minusPtr endPtr startPtr
-              !chunk = ByteString.fromPtrWithSize lastChunkLength startPtr
+              !chunk = ByteString.fromPtr lastChunkLength startPtr
               newNeededSize = neededSize - lastChunkLength
               newChunks = Cons chunk chunks
               loop = collectChunks newNeededSize newChunks
@@ -183,21 +179,15 @@ byteStringWhile predicate =
                   chunkLength =
                     minusPtr curPtr startPtr
                   !chunk =
-                    ByteString.fromPtrWithSize chunkLength startPtr
+                    ByteString.fromPtr chunkLength startPtr
                   merged =
-                    case chunks of
-                      Nil ->
-                        chunk
-                      _ ->
-                        ByteString.fromReverseStrictListWithSize
-                          (totalLength + chunkLength)
-                          (Cons chunk chunks)
+                    ByteString.fromReverseStrictListWithHead chunk totalLength chunks
                   in return (FinishedStatus curPtr merged)
             else let
               chunkLength =
                 minusPtr endPtr startPtr
               !chunk =
-                ByteString.fromPtrWithSize chunkLength startPtr
+                ByteString.fromPtr chunkLength startPtr
               newTotalLength =
                 totalLength + chunkLength
               newChunks =
