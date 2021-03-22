@@ -137,6 +137,15 @@ main =
             let input = J.runPut (J.putInt32be 1 <> J.putInt32be 2)
             consumeManyByteStrings (liftA2 (,) H.int32InBe H.int32InBe) [input]
               & assertEqual "" (Just (1, 2))
+        ,
+        testProperty "Composition over chunks"
+          $ let gen = do
+                  (a, b, c) <- arbitrary
+                  splitRandomly (J.runPut (J.putInt16be a <> J.putInt32be b <> J.putInt32be c))
+                in forAll gen
+          $ againstCereal
+            ((,,) <$> H.int16InBe <*> H.int32InBe <*> H.int32InBe)
+            ((,,) <$> J.getInt16be <*> J.getInt32be <*> J.getInt32be)
       ]
   ]
 
