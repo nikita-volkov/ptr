@@ -26,7 +26,7 @@ import qualified StrictList
 
 
 {-|
-Deserializer highly optimized to reading from pointers.
+Deserializer highly optimized for reading from pointers.
 
 Parsing ByteString is just a special case.
 -}
