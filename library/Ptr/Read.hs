@@ -64,7 +64,7 @@ Result of a single iteration.
 Errors can be achieved by using Either for output.
 -}
 data Status a =
-  FinishedStatus (Ptr Word8) a
+  FinishedStatus {-# UNPACK #-} !(Ptr Word8) a
   |
   UnfinishedStatus (Read a)
   deriving (Functor)
