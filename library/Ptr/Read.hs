@@ -308,7 +308,6 @@ nullTerminatedByteString =
 {-|
 Integral number encoded in ASCII.
 -}
-{-# INLINE asciiIntegral #-}
 asciiIntegral :: Integral a => Read a
 asciiIntegral =
   foldlWhile' Word8Predicates.asciiDigit step 0
