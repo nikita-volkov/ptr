@@ -1,2 +1,2 @@
-int32InBe*3                              mean 290.3 ns  ( +- 2.672 ns  )
 int32InBe                                mean 165.5 ns  ( +- 2.025 ns  )
+int32InBe*3                              mean 290.3 ns  ( +- 2.672 ns  )
