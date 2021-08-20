@@ -28,11 +28,64 @@ instance Applicative Peek where
         leftIO ptr <*> rightIO (plusPtr ptr leftSize)
 
 
+-- *
+
+{-# INLINE int8 #-}
+int8 :: Peek Int8
+int8 =
+  {-# SCC "int8" #-} 
+  Peek 1 A.peekStorable
+
+-- **
+
+{-# INLINE beInt16 #-}
+beInt16 :: Peek Int16
+beInt16 =
+  {-# SCC "beInt16" #-} 
+  Peek 2 A.peekBEInt16
+
+{-# INLINE beInt32 #-}
+beInt32 :: Peek Int32
+beInt32 =
+  {-# SCC "beInt32" #-} 
+  Peek 4 A.peekBEInt32
+
+{-# INLINE beInt64 #-}
+beInt64 :: Peek Int64
+beInt64 =
+  {-# SCC "beInt64" #-} 
+  Peek 8 A.peekBEInt64
+
+-- **
+
+{-# INLINE leInt16 #-}
+leInt16 :: Peek Int16
+leInt16 =
+  {-# SCC "leInt16" #-} 
+  Peek 2 A.peekLEInt16
+
+{-# INLINE leInt32 #-}
+leInt32 :: Peek Int32
+leInt32 =
+  {-# SCC "leInt32" #-} 
+  Peek 4 A.peekLEInt32
+
+{-# INLINE leInt64 #-}
+leInt64 :: Peek Int64
+leInt64 =
+  {-# SCC "leInt64" #-} 
+  Peek 8 A.peekLEInt64
+
+
+-- *
+
 {-# INLINE word8 #-}
 word8 :: Peek Word8
 word8 =
   {-# SCC "word8" #-} 
   Peek 1 A.peekWord8
+
+-- **
 
 {-# INLINE beWord16 #-}
 beWord16 :: Peek Word16
@@ -51,6 +104,28 @@ beWord64 :: Peek Word64
 beWord64 =
   {-# SCC "beWord64" #-} 
   Peek 8 A.peekBEWord64
+
+-- **
+
+{-# INLINE leWord16 #-}
+leWord16 :: Peek Word16
+leWord16 =
+  {-# SCC "leWord16" #-} 
+  Peek 2 A.peekLEWord16
+
+{-# INLINE leWord32 #-}
+leWord32 :: Peek Word32
+leWord32 =
+  {-# SCC "leWord32" #-} 
+  Peek 4 A.peekLEWord32
+
+{-# INLINE leWord64 #-}
+leWord64 :: Peek Word64
+leWord64 =
+  {-# SCC "leWord64" #-} 
+  Peek 8 A.peekLEWord64
+
+-- *
 
 {-# INLINE bytes #-}
 bytes :: Int -> Peek ByteString
