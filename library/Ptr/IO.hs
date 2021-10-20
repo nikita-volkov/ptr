@@ -177,8 +177,8 @@ peekNullTerminatedShortByteString ptr cont =
 
 {-# INLINE pokeStorable #-}
 pokeStorable :: Storable a => Ptr Word8 -> a -> IO ()
-pokeStorable ptr value =
-  poke (castPtr ptr) value
+pokeStorable =
+  poke . castPtr 
 
 {-# INLINE pokeWord8 #-}
 pokeWord8 :: Ptr Word8 -> Word8 -> IO ()
