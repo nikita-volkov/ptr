@@ -180,6 +180,11 @@ pokeStorable :: Storable a => Ptr Word8 -> a -> IO ()
 pokeStorable =
   poke . castPtr 
 
+{-# INLINE pokeStorableByteOff #-}
+pokeStorableByteOff :: Storable a => Ptr Word8 -> Int -> a -> IO ()
+pokeStorableByteOff =
+  pokeByteOff . castPtr
+
 {-# INLINE pokeWord8 #-}
 pokeWord8 :: Ptr Word8 -> Word8 -> IO ()
 pokeWord8 ptr value =
@@ -202,6 +207,18 @@ pokeBEWord16 ptr value =
     pokeByteOff ptr 1 (fromIntegral value :: Word8)
 #endif
 
+{-# INLINE pokeBEWord16ByteOff #-}
+pokeBEWord16ByteOff :: Ptr Word8 -> Int -> Word16 -> IO ()
+#ifdef WORDS_BIGENDIAN
+pokeBEWord16ByteOff =
+  pokeStorableByteOff
+#else
+pokeBEWord16ByteOff ptr off value =
+  do
+    pokeStorableByteOff ptr off (fromIntegral (D.shiftr_w16 value 8) :: Word8)
+    pokeByteOff ptr (off + 1) (fromIntegral value :: Word8)
+#endif
+
 {-# INLINE pokeBEWord32 #-}
 pokeBEWord32 :: Ptr Word8 -> Word32 -> IO ()
 #ifdef WORDS_BIGENDIAN
@@ -214,6 +231,20 @@ pokeBEWord32 ptr value =
     pokeByteOff ptr 1 (fromIntegral (D.shiftr_w32 value 16) :: Word8)
     pokeByteOff ptr 2 (fromIntegral (D.shiftr_w32 value 8) :: Word8)
     pokeByteOff ptr 3 (fromIntegral value :: Word8)
+#endif
+
+{-# INLINE pokeBEWord32ByteOff #-}
+pokeBEWord32ByteOff :: Ptr Word8 -> Int -> Word32 -> IO ()
+#ifdef WORDS_BIGENDIAN
+pokeBEWord32ByteOff =
+  pokeStorableByteOff
+#else
+pokeBEWord32ByteOff ptr off value =
+  do
+    pokeStorableByteOff ptr off (fromIntegral (D.shiftr_w32 value 24) :: Word8)
+    pokeByteOff ptr (off + 1) (fromIntegral (D.shiftr_w32 value 16) :: Word8)
+    pokeByteOff ptr (off + 2) (fromIntegral (D.shiftr_w32 value 8) :: Word8)
+    pokeByteOff ptr (off + 3) (fromIntegral value :: Word8)
 #endif
 
 {-# INLINE pokeBEWord64 #-}
@@ -242,6 +273,35 @@ pokeBEWord64 ptr value =
     pokeByteOff ptr 5 (fromIntegral (D.shiftr_w64 value 16) :: Word8)
     pokeByteOff ptr 6 (fromIntegral (D.shiftr_w64 value  8) :: Word8)
     pokeByteOff ptr 7 (fromIntegral value :: Word8)
+#endif
+#endif
+
+{-# INLINE pokeBEWord64ByteOff #-}
+pokeBEWord64ByteOff :: Ptr Word8 -> Int -> Word64 -> IO ()
+#ifdef WORDS_BIGENDIAN
+pokeBEWord64ByteOff =
+  pokeStorableByteOff
+#else
+#if WORD_SIZE_IN_BITS < 64
+--
+-- To avoid expensive 64 bit shifts on 32 bit machines, we cast to
+-- Word32, and write that
+--
+pokeBEWord64ByteOff ptr off value =
+  do
+    pokeBEWord32ByteOff ptr off (fromIntegral (D.shiftr_w64 value 32))
+    pokeBEWord32ByteOff ptr (off + 4) (fromIntegral value)
+#else
+pokeBEWord64ByteOff ptr off value =
+  do
+    pokeStorableByteOff ptr off (fromIntegral (D.shiftr_w64 value 56) :: Word8)
+    pokeByteOff ptr (off + 1) (fromIntegral (D.shiftr_w64 value 48) :: Word8)
+    pokeByteOff ptr (off + 2) (fromIntegral (D.shiftr_w64 value 40) :: Word8)
+    pokeByteOff ptr (off + 3) (fromIntegral (D.shiftr_w64 value 32) :: Word8)
+    pokeByteOff ptr (off + 4) (fromIntegral (D.shiftr_w64 value 24) :: Word8)
+    pokeByteOff ptr (off + 5) (fromIntegral (D.shiftr_w64 value 16) :: Word8)
+    pokeByteOff ptr (off + 6) (fromIntegral (D.shiftr_w64 value  8) :: Word8)
+    pokeByteOff ptr (off + 7) (fromIntegral value :: Word8)
 #endif
 #endif
 
