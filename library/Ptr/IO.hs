@@ -375,5 +375,10 @@ pokeBytesTrimming ptr maxLength (A.PS fptr offset length) =
 
 {-# INLINE pokeBytes #-}
 pokeBytes :: Ptr Word8 -> ByteString -> IO ()
+#if MIN_VERSION_bytestring(0,11,0)
+pokeBytes ptr (A.BS fptr length) =
+  withForeignPtr fptr $ \bytesPtr -> A.memcpy ptr bytesPtr length
+#else
 pokeBytes ptr (A.PS fptr offset length) =
   withForeignPtr fptr $ \bytesPtr -> A.memcpy ptr (plusPtr bytesPtr offset) length
+#endif
