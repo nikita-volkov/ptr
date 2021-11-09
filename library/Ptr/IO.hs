@@ -1,12 +1,11 @@
 {-# LANGUAGE CPP #-}
-module Ptr.IO
-where
 
-import Ptr.Prelude
+module Ptr.IO where
+
 import qualified Data.ByteString.Internal as A
 import qualified Data.ByteString.Short.Internal as B
+import Ptr.Prelude
 import qualified Ptr.UncheckedShifting as D
-
 
 {-# INLINE peekStorable #-}
 peekStorable :: Storable storable => Ptr Word8 -> IO storable
@@ -155,9 +154,8 @@ peekLEInt64 =
   peekStorable
 #endif
 
-{-|
-Allocate a new byte array with @memcpy@.
--}
+-- |
+-- Allocate a new byte array with @memcpy@.
 {-# INLINE peekBytes #-}
 peekBytes :: Ptr Word8 -> Int -> IO ByteString
 peekBytes ptr amount =
@@ -178,7 +176,7 @@ peekNullTerminatedShortByteString ptr cont =
 {-# INLINE pokeStorable #-}
 pokeStorable :: Storable a => Ptr Word8 -> a -> IO ()
 pokeStorable =
-  poke . castPtr 
+  poke . castPtr
 
 {-# INLINE pokeStorableByteOff #-}
 pokeStorableByteOff :: Storable a => Ptr Word8 -> Int -> a -> IO ()

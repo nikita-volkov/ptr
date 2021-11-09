@@ -1,16 +1,13 @@
-module Ptr.Poke
-where
+module Ptr.Poke where
 
-import Ptr.Prelude
-import qualified Ptr.PokeAndPeek as B
 import qualified Data.Vector as F
+import qualified Ptr.PokeAndPeek as B
+import Ptr.Prelude
 
-
-{-|
-Specification of a sized and errorless writing action to a pointer.
--}
-data Poke input =
-  Poke !Int !(Ptr Word8 -> input -> IO ())
+-- |
+-- Specification of a sized and errorless writing action to a pointer.
+data Poke input
+  = Poke !Int !(Ptr Word8 -> input -> IO ())
 
 instance Contravariant Poke where
   {-# INLINE contramap #-}
@@ -24,7 +21,6 @@ instance Divisible Poke where
   {-# INLINE divide #-}
   divide fn (Poke size1 io1) (Poke size2 io2) =
     Poke (size1 + size2) (\ptr input -> case fn input of (input1, input2) -> io1 ptr input1 *> io2 (plusPtr ptr size1) input2)
-
 
 {-# INLINE word8 #-}
 word8 :: Poke Word8
@@ -84,7 +80,7 @@ asciiDigit =
 {-# INLINE asciiHexDigit #-}
 asciiHexDigit :: Poke Word8
 asciiHexDigit =
-  contramap (\ n -> if n < 10 then 48 + n else 55 + n) word8
+  contramap (\n -> if n < 10 then 48 + n else 55 + n) word8
 
 {-# INLINE vector #-}
 vector :: Int -> Poke element -> Poke (F.Vector element)

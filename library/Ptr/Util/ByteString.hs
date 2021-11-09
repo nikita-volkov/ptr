@@ -1,18 +1,15 @@
-module Ptr.Util.ByteString
-where
+module Ptr.Util.ByteString where
 
-import Ptr.Prelude hiding (length)
 import Data.ByteString
-import Data.ByteString.Internal
-import qualified StrictList
 import qualified Data.ByteString as ByteString
+import Data.ByteString.Internal
+import Ptr.Prelude hiding (length)
+import qualified StrictList
 
-
-{-|
-__Warning:__
-
-It is your responsibility to ensure that the size is correct.
--}
+-- |
+-- __Warning:__
+--
+-- It is your responsibility to ensure that the size is correct.
 fromReverseStrictList :: Int -> List ByteString -> ByteString
 fromReverseStrictList size chunks =
   unsafeCreate size (\ptr -> loop (plusPtr ptr size) chunks)

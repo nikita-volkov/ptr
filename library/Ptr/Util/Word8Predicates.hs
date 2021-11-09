@@ -1,8 +1,6 @@
-module Ptr.Util.Word8Predicates
-where
+module Ptr.Util.Word8Predicates where
 
 import Ptr.Prelude
-
 
 asciiUpperLetter :: Word8 -> Bool = \x -> x - 65 <= 25
 
