@@ -66,8 +66,6 @@ data Status a
   | UnfinishedStatus (Read a)
   deriving (Functor)
 
--- *
-
 -------------------------
 
 runOnPtr :: Read a -> Ptr Word8 -> Ptr Word8 -> IO (Status a)
@@ -92,8 +90,6 @@ runOnByteStringFinishing :: Read a -> ByteString -> Maybe a
 runOnByteStringFinishing read byteString =
   runOnByteString read byteString
     & either (const Nothing) (Just . fst)
-
--- *
 
 -------------------------
 
@@ -203,8 +199,6 @@ foldlWhile' predicate step =
         else return (UnfinishedStatus (Read (loop acc)))
       where
         post = plusPtr start 1
-
--- *
 
 -------------------------
 
