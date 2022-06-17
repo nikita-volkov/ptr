@@ -35,10 +35,6 @@ import Data.Word
 import Foreign
 import Prelude
 
-#if MIN_VERSION_base(4,16,0)
-import qualified GHC.Exts as Exts
-#endif
-
 ------------------------------------------------------------------------
 -- Unchecked shifts
 
@@ -64,20 +60,13 @@ shiftr_w w s = fromIntegral $ (`shiftr_w64` s) $ fromIntegral w
 #endif
 
 #if !defined(__HADDOCK__)
-shiftr_w16 (W16# w) (I# i) = W16# (
 #if MIN_VERSION_base(4,16,0)
-  Exts.uncheckedShiftRLWord16#
+shiftr_w16 (W16# w) (I# i) = W16# (w `uncheckedShiftRLWord16#` i)
+shiftr_w32 (W32# w) (I# i) = W32# (w `uncheckedShiftRLWord32#` i)
 #else
-  uncheckedShiftRL#
+shiftr_w16 (W16# w) (I# i) = W16# (w `uncheckedShiftRL#` i)
+shiftr_w32 (W32# w) (I# i) = W32# (w `uncheckedShiftRL#` i)
 #endif
-  w i)
-shiftr_w32 (W32# w) (I# i) = W32# (
-#if MIN_VERSION_base(4,16,0)
-  Exts.uncheckedShiftRLWord32#
-#else
-  uncheckedShiftRL#
-#endif
-  w i)
 
 #if WORD_SIZE_IN_BITS < 64
 shiftr_w64 (W64# w) (I# i) = W64# (w `uncheckedShiftRL64#` i)
