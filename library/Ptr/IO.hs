@@ -8,7 +8,7 @@ import Ptr.Prelude
 import qualified Ptr.UncheckedShifting as D
 
 {-# INLINE peekStorable #-}
-peekStorable :: Storable storable => Ptr Word8 -> IO storable
+peekStorable :: (Storable storable) => Ptr Word8 -> IO storable
 peekStorable =
   peek . castPtr
 
@@ -155,11 +155,11 @@ peekLEInt64 =
 #endif
 
 -- |
--- Allocate a new byte array with @memcpy@.
+-- Allocate a new byte array with @copyBytes@.
 {-# INLINE peekBytes #-}
 peekBytes :: Ptr Word8 -> Int -> IO ByteString
 peekBytes ptr amount =
-  A.create amount $ \destPtr -> A.memcpy destPtr ptr amount
+  A.create amount $ \destPtr -> copyBytes destPtr ptr amount
 
 {-# INLINE peekShortByteString #-}
 peekShortByteString :: Ptr Word8 -> Int -> IO ShortByteString
@@ -174,12 +174,12 @@ peekNullTerminatedShortByteString ptr cont =
     cont length (B.createFromPtr ptr length)
 
 {-# INLINE pokeStorable #-}
-pokeStorable :: Storable a => Ptr Word8 -> a -> IO ()
+pokeStorable :: (Storable a) => Ptr Word8 -> a -> IO ()
 pokeStorable =
   poke . castPtr
 
 {-# INLINE pokeStorableByteOff #-}
-pokeStorableByteOff :: Storable a => Ptr Word8 -> Int -> a -> IO ()
+pokeStorableByteOff :: (Storable a) => Ptr Word8 -> Int -> a -> IO ()
 pokeStorableByteOff =
   pokeByteOff . castPtr
 
@@ -369,14 +369,14 @@ pokeLEWord64 =
 {-# INLINE pokeBytesTrimming #-}
 pokeBytesTrimming :: Ptr Word8 -> Int -> ByteString -> IO ()
 pokeBytesTrimming ptr maxLength (A.PS fptr offset length) =
-  withForeignPtr fptr $ \bytesPtr -> A.memcpy ptr (plusPtr bytesPtr offset) (min length maxLength)
+  withForeignPtr fptr $ \bytesPtr -> copyBytes ptr (plusPtr bytesPtr offset) (min length maxLength)
 
 {-# INLINE pokeBytes #-}
 pokeBytes :: Ptr Word8 -> ByteString -> IO ()
 #if MIN_VERSION_bytestring(0,11,0)
 pokeBytes ptr (A.BS fptr length) =
-  withForeignPtr fptr $ \bytesPtr -> A.memcpy ptr bytesPtr length
+  withForeignPtr fptr $ \bytesPtr -> copyBytes ptr bytesPtr length
 #else
 pokeBytes ptr (A.PS fptr offset length) =
-  withForeignPtr fptr $ \bytesPtr -> A.memcpy ptr (plusPtr bytesPtr offset) length
+  withForeignPtr fptr $ \bytesPtr -> copyBytes ptr (plusPtr bytesPtr offset) length
 #endif

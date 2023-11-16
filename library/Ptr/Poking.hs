@@ -2,7 +2,6 @@ module Ptr.Poking where
 
 import qualified Data.ByteString.Internal as B
 import qualified Data.List as List
-import qualified Data.Vector as F
 import qualified Data.Vector.Generic as GenericVector
 import qualified Ptr.IO as A
 import qualified Ptr.List as List
@@ -95,7 +94,7 @@ beWord64 x =
 {-# INLINE bytes #-}
 bytes :: ByteString -> Poking
 bytes (B.PS bytesFPtr offset length) =
-  Poking length (\ptr -> withForeignPtr bytesFPtr (\bytesPtr -> B.memcpy ptr (plusPtr bytesPtr offset) length))
+  Poking length (\ptr -> withForeignPtr bytesFPtr (\bytesPtr -> copyBytes ptr (plusPtr bytesPtr offset) length))
 
 {-# INLINE poke #-}
 poke :: C.Poke input -> input -> Poking
@@ -124,7 +123,7 @@ asciiChar =
   word8 . fromIntegral . ord
 
 {-# INLINEABLE asciiPaddedAndTrimmedIntegral #-}
-asciiPaddedAndTrimmedIntegral :: Integral a => Int -> a -> Poking
+asciiPaddedAndTrimmedIntegral :: (Integral a) => Int -> a -> Poking
 asciiPaddedAndTrimmedIntegral !length !integral =
   if length > 0
     then
@@ -142,7 +141,8 @@ asciiPaddedAndTrimmedIntegral !length !integral =
 -}
 asciiUtcTimeInIso8601 :: UTCTime -> Poking
 asciiUtcTimeInIso8601 utcTime =
-  asciiPaddedAndTrimmedIntegral 4 year <> word8 45
+  asciiPaddedAndTrimmedIntegral 4 year
+    <> word8 45
     <> asciiPaddedAndTrimmedIntegral 2 month
     <> word8 45
     <> asciiPaddedAndTrimmedIntegral 2 day
@@ -168,7 +168,7 @@ list element =
         _ -> state <> word8 0
 
 {-# INLINEABLE vector #-}
-vector :: GenericVector.Vector vector element => (element -> Poking) -> vector element -> Poking
+vector :: (GenericVector.Vector vector element) => (element -> Poking) -> vector element -> Poking
 vector element vectorValue =
   Poking byteSize io
   where
@@ -188,7 +188,7 @@ vector element vectorValue =
               return (plusPtr ptr elementByteSize)
 
 {-# INLINEABLE intercalateVector #-}
-intercalateVector :: GenericVector.Vector vector element => (element -> Poking) -> Poking -> vector element -> Poking
+intercalateVector :: (GenericVector.Vector vector element) => (element -> Poking) -> Poking -> vector element -> Poking
 intercalateVector element (Poking separatorLength separatorIo) vectorValue = Poking length io
   where
     length = GenericVector.foldl' step 0 vectorValue + ((GenericVector.length vectorValue - 1) * separatorLength)

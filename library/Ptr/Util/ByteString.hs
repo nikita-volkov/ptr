@@ -1,8 +1,8 @@
 module Ptr.Util.ByteString where
 
 import Data.ByteString
-import qualified Data.ByteString as ByteString
 import Data.ByteString.Internal
+import Foreign.Marshal.Utils
 import Ptr.Prelude hiding (length)
 import qualified StrictList
 
@@ -18,7 +18,7 @@ fromReverseStrictList size chunks =
       \case
         StrictList.Cons (PS fp off len) tail ->
           do
-            withForeignPtr fp $ \src -> memcpy ptr (plusPtr src off) len
+            withForeignPtr fp $ \src -> copyBytes ptr (plusPtr src off) len
             loop ptr tail
           where
             ptr = plusPtr endPtr (negate len)
@@ -33,4 +33,4 @@ fromReverseStrictListWithHead head sizeInTail tail =
 
 fromPtr :: Int -> Ptr Word8 -> ByteString
 fromPtr size src =
-  unsafeCreate size (\dst -> memcpy dst src size)
+  unsafeCreate size (\dst -> copyBytes dst src size)

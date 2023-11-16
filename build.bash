@@ -2,73 +2,22 @@
 set -eo pipefail
 
 function format {
-  ormolu --mode inplace -ce \
-  $(find . -name "*.hs" \
-    -not -path "./.git/*" \
-    -not -path "./*.stack-work/*" \
-    -not -path "./samples/*" \
-    -not -path "./sketches/*" \
-    -not -path "./output/*" \
-    -not -path "./ideas/*" \
-    -not -path "./refs/*" \
-    -not -path "./temp/*")
+  for path in $(git diff --staged --name-only -- '*.cabal') $(git ls-files -om --exclude-standard -- '*.cabal'); do if test -f $path; then cabal-fmt --no-tabular -c $path 2> /dev/null || cabal-fmt --no-tabular -i $path; fi; done
+  for path in $(git diff --staged --name-only -- '*.hs') $(git ls-files -om --exclude-standard -- '*.hs'); do if test -f $path; then ormolu -ic $path; fi; done
 }
 
-function build_and_test {
-  stack build \
-  --fast --test \
-  --ghc-options "-j +RTS -A128m -n2m -RTS -fwarn-incomplete-patterns"
-}
-
-function build_and_run_test_suite {
-  stack build \
-  --fast --test \
-  --ghc-options "-j +RTS -A128m -n2m -RTS -fwarn-incomplete-patterns" \
-  :$1
-}
-
-function build_and_test_by_pattern {
-  stack build \
-  --fast --test \
-  --ghc-options "-j +RTS -A128m -n2m -RTS -fwarn-incomplete-patterns" \
-  --ta "-p \"$1\"" $2
-}
-
-function build {
-  stack build \
-  --ghc-options "-j +RTS -A128m -n2m -RTS -fwarn-incomplete-patterns" \
-  --fast
-}
-
-function build_haddock {
-  stack haddock \
-  --ghc-options "-j +RTS -A128m -n2m -RTS -fwarn-incomplete-patterns" \
-  --fast
-}
-
-function build_failing_on_incomplete_patterns {
-  stack build \
-  --ghc-options "-j +RTS -A128m -n2m -RTS -Werror=incomplete-patterns" \
-  --fast
-}
-
-function install {
-  stack \
-  --work-dir ".install.stack-work" \
-  install \
-  --ghc-options "-j +RTS -A128m -n2m -RTS"
-}
-
-function install_forking {
-  mkdir -p .build-logs
-  install > .build-logs/install.stdout 2> .build-logs/install.stderr &
-}
-
-function build_haddock_forking {
-  mkdir -p .build-logs
-  build_haddock > .build-logs/build_haddock.stdout 2> .build-logs/build_haddock.stderr &
+function gen_hie {
+  gen-hie > hie.yaml
 }
 
 format
+# gen_hie
 
-build_and_test
+# cabal update
+
+cabal build all --enable-tests --enable-benchmarks -j +RTS -A128m -n2m -N -RTS --ghc-options="-Werror -Wall -Wincomplete-uni-patterns -Wincomplete-record-updates -Wredundant-constraints -Wunused-packages -Wno-name-shadowing -Wno-unused-matches -Wno-unused-do-bind -Wno-type-defaults"
+# cabal build all --enable-tests --enable-benchmarks -j +RTS -A128m -n2m -N -RTS
+# cabal test --test-show-details=direct --test-options="--qc-max-success=10000 --seed 1299275230 --match /TheatreDev/StmBased/allOf/"
+# cabal test --test-show-details=direct --test-options="--expert --failure-report=.last-hspec-report --rerun --rerun-all-on-success"
+
+# cabal haddock

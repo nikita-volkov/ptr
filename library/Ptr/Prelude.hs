@@ -1,4 +1,5 @@
 {-# LANGUAGE CPP #-}
+{-# OPTIONS_GHC -Wno-unused-imports #-}
 
 module Ptr.Prelude
   ( module Exports,
@@ -29,13 +30,14 @@ import Data.Either as Exports
 import Data.Fixed as Exports
 import Data.Foldable as Exports hiding (toList)
 import Data.Function as Exports hiding (id, (.))
-import Data.Functor as Exports
+import Data.Functor as Exports hiding (unzip)
 import Data.Functor.Compose as Exports
 import Data.Functor.Contravariant as Exports
 import Data.Functor.Contravariant.Divisible as Exports
 import Data.IORef as Exports
 import Data.Int as Exports
 import Data.Ix as Exports
+import Foreign.Marshal.Utils as Exports (copyBytes)
 #if MIN_VERSION_base(4,20,0)
 import Data.List as Exports hiding (List, all, and, any, concat, concatMap, elem, find, foldl, foldl', foldl1, foldr, foldr1, isSubsequenceOf, mapAccumL, mapAccumR, maximum, maximumBy, minimum, minimumBy, notElem, or, product, sortOn, sum, uncons)
 #else
