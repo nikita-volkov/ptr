@@ -15,8 +15,9 @@ poking (A.Poking size population) =
 parse :: B.ByteString -> C.Parse result -> (Int -> result) -> (Text -> result) -> result
 parse (B.PS fp offset length) (C.Parse parseIO) eoi error =
   {-# SCC "parse" #-}
-  unsafePerformIO $
-    withForeignPtr fp $ \ptr ->
+  unsafePerformIO
+    $ withForeignPtr fp
+    $ \ptr ->
       parseIO length (plusPtr ptr offset) (return . eoi) (return . error) (\result _ _ -> return result)
 
 {-# INLINE peek #-}
@@ -24,8 +25,9 @@ peek :: B.ByteString -> D.Peek result -> Maybe result
 peek (B.PS fp offset length) (D.Peek amount io) =
   {-# SCC "peek" #-}
   if amount <= length
-    then Just $
-      unsafePerformIO $
-        withForeignPtr fp $ \ptr ->
-          io (plusPtr ptr offset)
+    then Just
+      $ unsafePerformIO
+      $ withForeignPtr fp
+      $ \ptr ->
+        io (plusPtr ptr offset)
     else Nothing

@@ -4,7 +4,7 @@ import Ptr.Prelude
 
 {-# INLINE reverseDigits #-}
 reverseDigits ::
-  Integral a =>
+  (Integral a) =>
   -- | Radix
   a ->
   -- | Number
