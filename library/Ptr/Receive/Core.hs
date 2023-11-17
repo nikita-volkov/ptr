@@ -1,6 +1,5 @@
 module Ptr.Receive.Core where
 
-import qualified Data.ByteString.Internal as A
 import Ptr.Prelude
 
 write :: (Ptr Word8 -> Int -> IO (Either Text Int)) -> ForeignPtr Word8 -> IORef (Int, Int) -> Int -> Int -> Ptr Word8 -> IO (Either Text ())
@@ -16,11 +15,11 @@ write fetch bufferFP bufferStateRef chunkSize howMany destination =
          in if amountInBuffer >= howMany
               then -- Buffer contains all we need, so we don't need to fetch at all
               do
-                A.memcpy destination (plusPtr bufferPtr offset) howMany
+                copyBytes destination (plusPtr bufferPtr offset) howMany
                 writeIORef bufferStateRef (offset + howMany, end)
                 return (Right ())
               else do
-                A.memcpy destination (plusPtr bufferPtr offset) amountInBuffer
+                copyBytes destination (plusPtr bufferPtr offset) amountInBuffer
                 fetchMany fetch bufferFP bufferStateRef chunkSize (howMany - amountInBuffer) (plusPtr destination amountInBuffer)
 
 fetchMany :: (Ptr Word8 -> Int -> IO (Either Text Int)) -> ForeignPtr Word8 -> IORef (Int, Int) -> Int -> Int -> Ptr Word8 -> IO (Either Text ())
@@ -39,7 +38,7 @@ fetchMany fetch bufferFP bufferStateRef chunkSize remaining destination =
     withForeignPtr bufferFP $ \bufferPtr ->
       fetchingSome bufferPtr chunkSize $ \amountFetched ->
         do
-          A.memcpy destination bufferPtr remaining
+          copyBytes destination bufferPtr remaining
           writeIORef bufferStateRef (remaining, amountFetched)
           return (Right ())
   where
@@ -75,7 +74,7 @@ peek fetch bufferFP bufferStateRef chunkSize howMany peek =
                   else -- We still have something in the buffer, so we'll read from it first
                   withForeignPtr bufferFP $ \bufferPtr ->
                     do
-                      A.memcpy tmpPtr (plusPtr bufferPtr offset) amountInBuffer
+                      copyBytes tmpPtr (plusPtr bufferPtr offset) amountInBuffer
                       fetchMany fetch bufferFP bufferStateRef chunkSize (howMany - amountInBuffer) (plusPtr tmpPtr amountInBuffer)
               case writeResult of
                 Right () -> do

@@ -1,7 +1,6 @@
 module Ptr.Parse where
 
 import qualified Data.ByteString.Char8 as B
-import qualified Data.ByteString.Short.Internal as E
 import qualified Ptr.IO as D
 import qualified Ptr.PokeAndPeek as A
 import Ptr.Prelude hiding (peek, take)
@@ -224,7 +223,7 @@ foldWhile predicate step start =
 -- |
 -- Unsigned integral number encoded in ASCII.
 {-# INLINE unsignedASCIIIntegral #-}
-unsignedASCIIIntegral :: Integral a => Parse a
+unsignedASCIIIntegral :: (Integral a) => Parse a
 unsignedASCIIIntegral =
   {-# SCC "unsignedASCIIIntegral" #-}
   foldWhile byteIsDigit step 0

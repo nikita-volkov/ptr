@@ -1,0 +1,8 @@
+packages: .
+allow-newer:
+  , *:base
+  , *:bytestring
+  , *:deepseq
+  , *:primitive
+  , *:text
+  , exceptions:*

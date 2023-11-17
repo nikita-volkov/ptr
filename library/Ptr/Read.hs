@@ -23,7 +23,6 @@ import qualified Ptr.IO as IO
 import Ptr.Prelude hiding (Read)
 import qualified Ptr.Util.ByteString as ByteString
 import qualified Ptr.Util.Word8Predicates as Word8Predicates
-import qualified StrictList
 
 -- |
 -- Deserializer highly optimized for reading from pointers.
@@ -74,8 +73,9 @@ runOnPtr =
 
 runOnByteString :: Read a -> ByteString -> Either (Read a) (a, ByteString)
 runOnByteString (Read read) (ByteString.PS bsFp bsOff bsSize) =
-  unsafePerformIO $
-    withForeignPtr bsFp $ \p ->
+  unsafePerformIO
+    $ withForeignPtr bsFp
+    $ \p ->
       let startP = plusPtr p bsOff
           endP = plusPtr startP bsSize
        in read startP endP <&> \case
@@ -278,7 +278,7 @@ nullTerminatedByteString =
 
 -- |
 -- Integral number encoded in ASCII.
-asciiIntegral :: Integral a => Read a
+asciiIntegral :: (Integral a) => Read a
 asciiIntegral =
   foldlWhile' Word8Predicates.asciiDigit step 0
   where
