@@ -1,6 +1,6 @@
 cabal-version: 3.0
 name:          ptr
-version:       0.16.8.5
+version:       0.16.8.6
 category:      Ptr, Data
 synopsis:      Experimental abstractions for operations on pointers
 description:
@@ -85,7 +85,7 @@ library
 
   build-depends:
     , base >=4.11 && <5
-    , bytestring >=0.10 && <0.12
+    , bytestring >=0.10 && <0.13
     , contravariant >=1.3 && <2
     , profunctors >=5.1 && <6
     , strict-list >=0.1.5 && <0.2
