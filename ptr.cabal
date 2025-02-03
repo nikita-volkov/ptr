@@ -1,6 +1,6 @@
 cabal-version: 3.0
 name:          ptr
-version:       0.16.8.6
+version:       0.16.8.7
 category:      Ptr, Data
 synopsis:      Experimental abstractions for operations on pointers
 description:
@@ -16,7 +16,7 @@ license-file:  LICENSE
 
 source-repository head
   type:     git
-  location: git://github.com/nikita-volkov/ptr.git
+  location: https://github.com/nikita-volkov/ptr
 
 library
   hs-source-dirs:     library
