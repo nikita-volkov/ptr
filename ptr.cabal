@@ -1,28 +1,26 @@
 cabal-version: 3.0
-name:          ptr
-version:       0.16.8.7
-category:      Ptr, Data
-synopsis:      Experimental abstractions for operations on pointers
+name: ptr
+version: 0.16.8.7
+category: Ptr, Data
+synopsis: Experimental abstractions for operations on pointers
 description:
   Collection of experimental abstractions over pointer operations.
 
-homepage:      https://github.com/nikita-volkov/ptr
-bug-reports:   https://github.com/nikita-volkov/ptr/issues
-author:        Nikita Volkov <nikita.y.volkov@mail.ru>
-maintainer:    Nikita Volkov <nikita.y.volkov@mail.ru>
-copyright:     (c) 2017, Nikita Volkov
-license:       MIT
-license-file:  LICENSE
+homepage: https://github.com/nikita-volkov/ptr
+bug-reports: https://github.com/nikita-volkov/ptr/issues
+author: Nikita Volkov <nikita.y.volkov@mail.ru>
+maintainer: Nikita Volkov <nikita.y.volkov@mail.ru>
+copyright: (c) 2017, Nikita Volkov
+license: MIT
+license-file: LICENSE
 
 source-repository head
-  type:     git
+  type: git
   location: https://github.com/nikita-volkov/ptr
 
 library
-  hs-source-dirs:     library
+  hs-source-dirs: library
   default-extensions:
-    NoImplicitPrelude
-    NoMonomorphismRestriction
     Arrows
     BangPatterns
     BlockArguments
@@ -45,6 +43,8 @@ library
     MagicHash
     MultiParamTypeClasses
     MultiWayIf
+    NoImplicitPrelude
+    NoMonomorphismRestriction
     OverloadedStrings
     ParallelListComp
     PatternGuards
@@ -61,7 +61,7 @@ library
     TypeOperators
     UnboxedTuples
 
-  default-language:   Haskell2010
+  default-language: Haskell2010
   exposed-modules:
     Ptr.ByteString
     Ptr.IO
@@ -84,23 +84,25 @@ library
     Ptr.Util.Word8Predicates
 
   build-depends:
-    , base >=4.11 && <5
-    , bytestring >=0.10 && <0.13
-    , contravariant >=1.3 && <2
-    , profunctors >=5.1 && <6
-    , strict-list >=0.1.5 && <0.2
-    , text >=1 && <3
-    , time >=1 && <2
-    , vector >=0.12 && <0.14
+    base >=4.11 && <5,
+    bytestring >=0.10 && <0.13,
+    contravariant >=1.3 && <2,
+    profunctors >=5.1 && <6,
+    strict-list >=0.1.5 && <0.2,
+    text >=1 && <3,
+    time >=1 && <2,
+    vector >=0.12 && <0.14,
 
 test-suite tests
-  type:               exitcode-stdio-1.0
-  hs-source-dirs:     tests
-  main-is:            Main.hs
-  ghc-options:        -O2 -threaded -with-rtsopts=-N
+  type: exitcode-stdio-1.0
+  hs-source-dirs: tests
+  main-is: Main.hs
+  ghc-options:
+    -O2
+    -threaded
+    -with-rtsopts=-N
+
   default-extensions:
-    NoImplicitPrelude
-    NoMonomorphismRestriction
     Arrows
     BangPatterns
     BlockArguments
@@ -123,6 +125,8 @@ test-suite tests
     MagicHash
     MultiParamTypeClasses
     MultiWayIf
+    NoImplicitPrelude
+    NoMonomorphismRestriction
     OverloadedStrings
     ParallelListComp
     PatternGuards
@@ -139,25 +143,27 @@ test-suite tests
     TypeOperators
     UnboxedTuples
 
-  default-language:   Haskell2010
+  default-language: Haskell2010
   build-depends:
-    , cereal >=0.5.8 && <0.6
-    , ptr
-    , QuickCheck >=2.8.1 && <3
-    , quickcheck-instances >=0.3.11 && <0.4
-    , rerebase <2
-    , tasty >=0.12 && <2
-    , tasty-hunit >=0.9 && <0.11
-    , tasty-quickcheck >=0.9 && <0.12
+    QuickCheck >=2.8.1 && <3,
+    cereal >=0.5.8 && <0.6,
+    ptr,
+    quickcheck-instances >=0.3.11 && <0.4,
+    rerebase <2,
+    tasty >=0.12 && <2,
+    tasty-hunit >=0.9 && <0.11,
+    tasty-quickcheck >=0.9 && <0.12,
 
 benchmark bench
-  type:               exitcode-stdio-1.0
-  hs-source-dirs:     bench
-  main-is:            Main.hs
-  ghc-options:        -O2 -threaded -with-rtsopts=-N
+  type: exitcode-stdio-1.0
+  hs-source-dirs: bench
+  main-is: Main.hs
+  ghc-options:
+    -O2
+    -threaded
+    -with-rtsopts=-N
+
   default-extensions:
-    NoImplicitPrelude
-    NoMonomorphismRestriction
     Arrows
     BangPatterns
     BlockArguments
@@ -180,6 +186,8 @@ benchmark bench
     MagicHash
     MultiParamTypeClasses
     MultiWayIf
+    NoImplicitPrelude
+    NoMonomorphismRestriction
     OverloadedStrings
     ParallelListComp
     PatternGuards
@@ -196,9 +204,9 @@ benchmark bench
     TypeOperators
     UnboxedTuples
 
-  default-language:   Haskell2010
+  default-language: Haskell2010
   build-depends:
-    , cereal >=0.5.8 && <0.6
-    , criterion ^>=1.6
-    , ptr
-    , rerebase >=1.10.0.1 && <2
+    cereal >=0.5.8 && <0.6,
+    criterion ^>=1.6,
+    ptr,
+    rerebase >=1.10.0.1 && <2,
