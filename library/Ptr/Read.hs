@@ -23,6 +23,7 @@ import qualified Ptr.IO as IO
 import Ptr.Prelude hiding (Read)
 import qualified Ptr.Util.ByteString as ByteString
 import qualified Ptr.Util.Word8Predicates as Word8Predicates
+import qualified StrictList
 
 -- |
 -- Deserializer highly optimized for reading from pointers.
@@ -134,7 +135,7 @@ byteString ::
   Int ->
   Read ByteString
 byteString totalNeededSize =
-  Read (collectChunks totalNeededSize Nil)
+  Read (collectChunks totalNeededSize StrictList.Nil)
   where
     collectChunks neededSize chunks startPtr endPtr =
       let nextPtr = plusPtr startPtr neededSize
@@ -149,13 +150,13 @@ byteString totalNeededSize =
               let lastChunkLength = minusPtr endPtr startPtr
                   !chunk = ByteString.fromPtr lastChunkLength startPtr
                   newNeededSize = neededSize - lastChunkLength
-                  newChunks = Cons chunk chunks
+                  newChunks = StrictList.Cons chunk chunks
                   loop = collectChunks newNeededSize newChunks
                in return (UnfinishedStatus (Read loop))
 
 byteStringWhile :: (Word8 -> Bool) -> Read ByteString
 byteStringWhile predicate =
-  Read (collectChunks 0 Nil)
+  Read (collectChunks 0 StrictList.Nil)
   where
     collectChunks totalLength chunks startPtr endPtr =
       populateChunk startPtr
@@ -182,7 +183,7 @@ byteStringWhile predicate =
                   newTotalLength =
                     totalLength + chunkLength
                   newChunks =
-                    Cons chunk chunks
+                    StrictList.Cons chunk chunks
                in return (UnfinishedStatus (Read (collectChunks newTotalLength newChunks)))
 
 foldlWhile' :: (Word8 -> Bool) -> (acc -> Word8 -> acc) -> acc -> Read acc

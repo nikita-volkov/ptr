@@ -10,7 +10,7 @@ import qualified StrictList
 -- __Warning:__
 --
 -- It is your responsibility to ensure that the size is correct.
-fromReverseStrictList :: Int -> List ByteString -> ByteString
+fromReverseStrictList :: Int -> StrictList ByteString -> ByteString
 fromReverseStrictList size chunks =
   unsafeCreate size (\ptr -> loop (plusPtr ptr size) chunks)
   where
@@ -25,7 +25,7 @@ fromReverseStrictList size chunks =
         StrictList.Nil ->
           return ()
 
-fromReverseStrictListWithHead :: ByteString -> Int -> List ByteString -> ByteString
+fromReverseStrictListWithHead :: ByteString -> Int -> StrictList ByteString -> ByteString
 fromReverseStrictListWithHead head sizeInTail tail =
   if sizeInTail == 0
     then head

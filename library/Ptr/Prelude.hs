@@ -74,7 +74,7 @@ import GHC.Generics as Exports (Generic)
 import GHC.IO.Exception as Exports
 import GHC.OverloadedLabels as Exports
 import Numeric as Exports
-import StrictList as Exports (List (..))
+import StrictList as Exports (StrictList)
 import System.Environment as Exports
 import System.Exit as Exports
 import System.IO as Exports (Handle, hClose)
